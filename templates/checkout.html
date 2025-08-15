@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout Page</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #e0dada;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .checkout-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .billing-details, .order-summary {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .billing-details input, .billing-details select {
+      width: 98%;
+      padding: 10px;
+      margin: 8px 0 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .order-summary table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .order-summary td {
+      padding: 12px 0;
+    }
+
+    .total {
+      font-weight: bold;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    .btn:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+  {% if success %}
+  <div id="success-message" style="text-align:center; background:#eff1f0; color:#155724; padding:25px; border-radius:8px; margin-bottom:20px;">
+    <strong>✅ Order placed successfully!</strong><br>
+    Thank you for shopping with us.<br><br>
+    Use <strong>ID #{{ order_id }}</strong> to track your order.
+  </div>
+{% endif %}
+<body>
+<h2>Checkout</h2>
+<form id="checkout-form" method="POST" action="/checkout/">
+  {% csrf_token %}
+<div class="checkout-container">  
+  <input type='hidden' name='itemsjson' id='itemsjson'>
+  <div class="billing-details">
+    <h3>Billing Details</h3>
+      {%csrf_token%}
+    <input type="text" placeholder="Full Name" id="name" name='name' required>
+    <input type="email" placeholder="Email Address" id="email" name='email' required>
+    <input type="text" placeholder="Phone Number" id="phone" name='phone' required>
+    <input type="text" placeholder="Address" id="address" name='address' required>
+    <select id="city" name='city' >
+      <option value="">Select City</option>
+      <option value="peshawar">Peshawar</option>
+      <option value="karachi">karachi</option>
+      <option value="Lahore">Lahore</option>
+      <option value="Islamabad">Islamabad</option>
+      <option value="fasalabad">fasalabad</option>
+    </select>
+    <input type="text" placeholder="State" id="state" name='state' required>
+    <input type="text" placeholder="Postal Code" id="zip_code" name='zip_code' required>
+  </div>
+
+  <!-- Order Summary -->
+<div class="order-summary">
+  <h3>Your Order</h3>
+  <table id="checkout-table">
+     <tbody></tbody>
+  </table>
+  <button type='submit' class="btn" id="place-order-btn">Place Order</button>
+</div>
+</form>
+<script>
+  document.getElementById("place-order-btn").addEventListener("click", () => {
+  const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+  if (cartItems.length === 0) {
+    alert("Your cart is empty. Please add items before checking out.");
+    window.location.href = "cart.html"; // replace with your cart page
+    return;
+}
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const address = document.getElementById("address").value.trim();
+
+    if (!name || !email || !phone || !address) {
+      alert("Please fill in all required billing details.");
+      return;
+    }
+  // alert("Order placed successfully!\nThank you for shopping with us.");
+  // document.getElementById("name").value = "";
+  // document.getElementById("email").value = "";
+  // document.getElementById("phone").value = "";
+  // document.getElementById("address").value = "";
+  // document.getElementById("city").value = "";
+  // document.getElementById("zip").value = "";
+  //Clear cart from localStorage
+  // localStorage.removeItem("cartItems");
+  // localStorage.removeItem("Total");
+  // localStorage.removeItem("discountedTotal");
+  // //Clear the checkout table
+  // document.querySelector("#checkout-table tbody").innerHTML = "";
+  document.getElementById("itemsjson").value = JSON.stringify(cartItems);
+  });
+  document.addEventListener("DOMContentLoaded", () => {
+  const checkoutTableBody = document.querySelector("#checkout-table tbody");
+
+  const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+  {% comment %} if (cartItems.length === 0) {
+   alert("Your cart is empty. Please add items before checking out.");
+    window.location.href = "cart.html"; // replace with your cart page
+    return;
+} {% endcomment %}
+  let check_total = 0;
+
+  cartItems.forEach(item => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${item.name}&nbsp;&nbsp&nbsp;&nbsp  <strong>x${item.quantity}<strong></td>
+      <td>Rs. ${item.subtotal}</td>
+    `;
+    checkoutTableBody.appendChild(row);
+    check_total += Number(item.subtotal);
+  });
+
+  // Shipping Row
+  const shippingRow = document.createElement("tr");
+  shippingRow.innerHTML = `
+    <td>Shipping</td>
+    <td>Free</td>
+  `;
+  checkoutTableBody.appendChild(shippingRow);
+
+  // Total Row
+  // Check for coupon discount
+  let discountedTotal = localStorage.getItem("discountedTotal");
+  const isCouponApplied = localStorage.getItem("couponApplied") === "true";
+  const total=localStorage.getItem("Total");
+  // Show Total Row
+  const totalRow = document.createElement("tr");
+  totalRow.classList.add("total");
+
+  if (isCouponApplied && discountedTotal !== null) {
+    totalRow.innerHTML = `
+      <td><strong>Total (Discount Applied)</strong></td>
+      <td id="checkout-total"><strong>Rs. ${discountedTotal}</strong></td>
+    `;
+  } else {
+    totalRow.innerHTML = `
+      <td><strong>Total</strong></td>
+      <td id="checkout-total"><strong>Rs. ${total}</strong></td>
+    `;
+  }
+
+  checkoutTableBody.appendChild(totalRow);
+  
+});
+
+//when user click on back buuton on browser
+window.addEventListener("beforeunload", function (e) {
+ localStorage.removeItem("discountedTotal")
+  // You can show a confirmation dialog in some browsers
+  e.preventDefault();
+  
+  e.returnValue = '';
+  
+});
+// when order palce this code will run
+ const successMessage = document.getElementById("success-message");
+
+  if (successMessage) {
+    // Clear cart and related values
+    localStorage.removeItem("cartItems");
+    localStorage.removeItem("Total");
+    localStorage.removeItem("discountedTotal");
+    localStorage.removeItem("couponApplied");
+
+    // Clear form fields
+    document.getElementById("checkout-form").reset();
+
+    // Clear the checkout table
+    document.querySelector("#checkout-table tbody").innerHTML = "";
+  }
+</script>
+
+</body>
+</html>

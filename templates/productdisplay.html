@@ -1,0 +1,177 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{{ product.name }} - GrowSmart.com</title>
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+  <script src="https://kit.fontawesome.com/a18ae6822d.js" crossorigin="anonymous"></script>
+  <style>
+
+    #related-products {
+      padding: 50px 80px;
+      background-color: #f9f9f9;
+    }
+
+    #related-products h2 {
+      font-size: 28px;
+      margin-bottom: 30px;
+      color: #222;
+      text-align: center;
+    }
+
+    .product-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 100px;
+    }
+
+    .product-card {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      text-align: center;
+      padding: 15px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      height: 340px;
+      width: 250px;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      border: solid 1px red;
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .product-card p {
+      margin: 20px 0 5px;
+      color: #4e4c4c;
+      font-size: 16px;
+    }
+
+    .product-card p:last-child {
+      font-weight: bold;
+      color: #008000;
+    }
+  </style>
+</head>
+<body>
+  <a id="top-section"></a>
+  <header>
+    <div class="navbar">
+      <div class="nav-logo">
+        <a href="{% url 'index' %}">
+          <div class="logo border"></div>
+        </a>
+    </div>
+    </div>
+  </header>
+
+  <!-- PRODUCT DETAIL SECTION -->
+  <section id="prodetails" id="section-p1">
+    <div class="single-pro-img">
+      <img src="{{ product.image.url }}" width="550" id="main-img" alt="{{ product.name }}">
+      <div class="small-img-group">
+        {% for i in "1234" %}
+          <div class="small-img-col">
+            <img src="{{ product.image.url }}" width="100%" class="small-img" alt="small-img">
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="single-pro-detail">
+      <p>home > product</p>
+      <h4 id="product-name">{{ product.name }}</h4>
+      <h2 id="product-price">Rs. {{ product.price }}</h2>
+      <hr>
+      <ul style="list-style-type: none; padding-bottom: 10px; padding-top: 20px; margin-left: -40px;">
+        <li><strong>Description:</strong> {{ product.desc }}</li>
+      </ul>
+       <ul style="list-style-type: none; padding-bottom: 50px; padding-top: 20px;">
+        <li class="Stock" style="display: flex; align-items: center; gap: 5px; margin-bottom: -20px;">
+        {% if product.stock and product.stock > 0 %}
+            <p id="stock1" style="margin-left:-40px;">Stock available:</p>
+            <i class="fa-solid fa-check"></i>
+            <p id="stock2">{{ product.stock }}</p>
+        {% else %}
+            <p id="stock1">Out of stock</p>
+        {% endif %}
+        </li>
+       </ul>
+        <li class="ship" style="display: flex; align-items: center; gap: 5px;margin-bottom: 8px;">
+           <p>Ships in:</p><p style="font-weight: 500;">24 Hour</p>
+        </li>
+        <li class="delevery" style="display: flex; align-items: center; gap: 5px;margin-bottom: 8px;">
+            <p>Delever Area:</p><p style="font-weight: 500;" 500;>Peshawar only</p>
+        </li>
+        <li class="delever by" style="display: flex; align-items: center; gap: 5px;margin-bottom: 50px;">
+            <p>Delever By:</p><p style="font-weight: 500;" 500;>Grow-Smart.com</p>
+        </li>
+        </ul>
+      <form action="{% url 'add_carts' product.id %}" method="POST">
+  {% csrf_token %}
+  <input type="number" name="quantity" value="1"  class="item_count" style='margin-left:-10px'>
+  <button type="submit" class="addtocart" style='margin-left:10px'>Add to Cart</button>
+</form>
+
+    </div>
+  </section>
+<section id="related-products">
+  <h2>Related Products</h2>
+  <div class="product-container">
+    {% for item in related_products %}
+      <div class="product-card">
+        <a href="{% url 'productdisplay' item.id %}">
+          <img src="{{ item.image.url }}" alt="{{ item.name }}">
+          <p>{{ item.name }}</p>
+          <p>Rs {{ item.price }}</p>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+
+  <!-- FOOTER -->
+  <footer>
+  </footer>
+  <script>
+    var main_img = document.querySelector("#main-img");
+    var small_img = document.querySelectorAll(".small-img");
+
+    small_img.forEach((img, index) => {
+      img.onclick = () => {
+        main_img.src = img.src;
+      }
+    });
+
+    const addtocart_btn = document.querySelector(".addtocart");
+    addtocart_btn.addEventListener("click", () => {
+      const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      const name = document.getElementById("product-name").innerText;
+      const price = document.getElementById("product-price").innerText.replace("Rs.", "").trim();
+      const quantity = document.querySelector(".item_count").value;
+      const image = document.getElementById("main-img").src;
+      const product = {
+        name,
+        price,
+        quantity,
+        image,
+        subtotal: Number(price) * Number(quantity)
+      };
+
+      cartItems.push(product);
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      alert("Item added to cart!");
+    });
+  </script>
+</body>
+</html>

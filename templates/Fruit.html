@@ -1,0 +1,276 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrowSmart.com</title>
+    <link rel="stylesheet" href="{% static 'style.css'%}">
+    
+    <script src="https://kit.fontawesome.com/a18ae6822d.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a id="top-section" ></a>
+    <header>
+        <div class="navbar">
+              <div class="nav-logo">
+            <a href="index">
+            <div class="logo border"></div>
+            </a>
+             </div>
+        <form name='search' class='search' action="{% url 'search'%}" method='GET'>
+         <div class="search-bar">
+            <select class="search-select">
+                <option>All</option>
+                <option value="fruit">Fruits</option>
+                <option value="Vigitables">Vigitables</option>
+                <option value="seeds">Seeds</option>
+                <option value="Dryfruit">Dryfruit</option>
+            </select>
+            <input placeholder="Search" class="search-input" name='keyword'>
+            <div class="search-icon">
+            <button type="submit" class="search-btn" style="width: 35px; height: 35px; background-color:  rgb(240, 240, 67);  border: none; font-size:20px">
+             <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+           </div>
+
+        </div>
+    </form>
+    <div class="sell_product">
+     <a href='addproduct'> Sell</a>
+    </div>
+        <div class='tracker'>
+        <a href='tracker'>Tracker</a>  
+        </div>
+        <div class="login">
+        <a href="login" target="_blank">Login</a>
+        </div>
+        <div class="regester">
+        <a href="regester" target="_blank">Regester</a>
+        </div>
+        <div class="cart">
+        <div class="icon"><i class="fa-solid fa-cart-shopping"></i> 
+        <a href="cart.html">  Cart </a>
+        </div>
+        </div>
+        </div>
+    </header>
+    <div class="hero-section">
+    <div class="image"><img src="{% static 'images/Fresh-Food_7a9e8440-2c83-4b51-820c-72fa7aa49498.webp'%}" id="m1"></div>
+    <div id="text"><a>You are on Grow Smart.com enjoy your Shoping</a></div>
+    </div>
+  </div>
+   <div id="chatbot-container">
+  <div id="chatbot-text">Hi! i am Kitti how can i help you </div>
+  <div id="chatbot-icon">
+    <i class="fa-brands fa-rocketchat"></i>
+  </div>
+</div>
+<div id="chatbot-window">
+  <iframe 
+    src="index2.html" frameborder="0" allow="microphone;" title="Chatbot"></iframe>
+</div>
+<div class="catagory-heading">
+    <h2>Fresh Fruits</h2>
+</div>
+  <div class="shop-section catagory-fruit">
+<div class="box1 box" onclick="window.location.href='productpage.html?name=Pineapple%20(Ananas)%2C%20Per%20Piece&price=2900&image=ananas.jpg';">
+    <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/ananas.jpg');"></div>
+   <P class="product-name">  Pineapple (Ananas), Per Piece</P>
+  <p id="price">Rs. 2900</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box2 box" onclick="window.location.href='productpage.html?name=Watermelon%20(Tarbooz)%20Local%2C%20Per%20Piece&price=1150&image=images/watermillon.jpg&path=Home%20Fruit%20productd';"
+>
+     <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/watermillon.jpg');"></div>
+   <P class="product-name">  Watermelon (Tarbooz) Local, Per Piece</P>
+  <p id="price">Rs. 1,150</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box3 box" onclick="window.location.href='productpage.html?name=Fresh%20Basket%20Green%20Grapes%2C%20Local%2C%201%20KG&price=2200&image=images/grapes.jpg';">
+     <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/grapes.jpg');"></div>
+    <P class="product-name"> Fresh Basket Green Grapes, Local, 1 KG
+</P>
+  <p id="price">Rs. 2,200</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box4 box" onclick="window.location.href='productpage.html?name=Peach%20Local%2C%20500g%20(Approx)&price=700&image=images/peach.jpg';">
+     <div class="box-content">
+ 
+   <div class="box-img" style="background-image: url('static/images/peach.jpg');"></div>
+ <p class="product-name"> Peach Local, 500g (Approx)</p>
+<p id="price">Rs. 700</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+    <div class="box1 box" onclick="window.location.href='productpage.html?name=Cherry%20Local%2C%201-Pack&price=450&image=images/cheery.jpg';">
+    <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/cheery.jpg');"></div>
+   <P class="product-name">  Cherry Local, 1-Pack</P>
+  <p id="price">Rs. 450</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box2 box" onclick="window.location.href='productpage.html?name=Mango%20Sindhri%2C%201%20KG%20(Approx)&price=560&image=images/mango.jpg';">
+     <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/mango.jpg');"></div>
+   <P class="product-name"> Mango Sindhri, 1 KG (Approx)
+</P>
+  <p id="price">Rs. 560</p>
+   </div>
+     <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box3 box" onclick="window.location.href='productpage.html?name=Imported%20Dragon%20Fruit%2C%201%20Piece&price=200&image=images/dragon.jpg';">
+     <div class="box-content">
+  
+   <div class="box-img" style="background-image: url('static/images/dragon.jpg');"></div>
+    <P class="product-name"> Imported Dragon Fruit, 1 Piece
+</P>
+  <p id="price">Rs. 200</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box4 box" onclick="window.location.href='productpage.html?name=Plum%20(Aloo%20Bukhara)%20Local%2C%20500g%20(Approx)&price=350&image=images/plum.jpg';">
+     <div class="box-content">
+ 
+   <div class="box-img" style="background-image: url('static/images/plum.jpg');"></div>
+ <p class="product-name"> Plum (Aloo Bukhara) Local, 500g (Approx)</p>
+<p id="price">Rs. 350</p>
+   </div>
+     <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+ </div>
+ </div>
+ <div class="shop-section">
+  {% for product in products %}
+  {% if product.category == 'fruit' or product.category == 'Fruit' or product.category == 'fruits' or product.category == 'Fruits'%}
+  <div class="box" onclick="window.location.href='{% url 'productdisplay' product.id %}'">
+    <div class="box-content">
+      <div class="box-img" style="background-image: url('{{ product.image.url }}');"></div>
+      <p class="product-name">{{ product.name }}</p>
+      <p id="price">Rs. {{ product.price }}</p>
+       <form  action="{% url 'add_carts' product.id %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="quantity" value="1">
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <button type="submit" class="icon-button" style="cursor:pointer;border-radius:50px;border-color:#4169E1;height:42px;width:42px;background-color:#A2DEE9;"   onclick="event.stopPropagation();"><i class="fa-solid fa-cart-shopping add-to-cart-icon" style=" transform: translate(-20%,-4px);color:#0F0FD1;"></i></button>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+</form>
+    </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+ <footer>
+    <div class="navfooterbacktotoptext">
+        <a href="#top-section"><p>Back to top</p></a> 
+    </div>
+    <div class="foot-panel2">
+      <ul>
+        <p>Contact Details</p>
+        <a> <i class="fa-solid fa-location-dot"></i> Ring road peshawar</a>
+        <a>
+       <a><i class="fa-solid fa-phone">(092)3189398866</i> </a>
+        <a>Customer Support: 7 Days a Week, 9:00am - 10:00pm </a>
+        <div class="social-media">
+  <a href="https:\\www.facebook.com" class="fa-facebook social-m"><i class="fa-brands fa-facebook"></i></a>
+  <a href="https:\\www.instagram.com"class="instagram social-m"><i class="fa-brands fa-instagram"></i></a>
+  <a href="https:\\www.youtube.com"  class="youtube social-m"><i class="fa-brands fa-youtube"></i></a>
+  <a href="https:\\www.tiktok.com"   class="tiktok social-m"><i class="fa-brands fa-tiktok"></i>
+        </a>
+        </div>
+      </ul>
+<ul>	
+<p>Customer Services</p>
+<a>Contact Us</a>
+<a>FAQs</a>
+</ul>
+<ul>
+<p>Information</p>
+<a>Return & Refund</a>
+<a>Privacy Policy</a>
+<a>Terms & Conditions </a>
+</ul>
+<ul>
+<p>Subscribe our Newsletter</p>
+<a>Get the latest offers and promotions!</a>
+<div class="Newsletter">
+<input placeholder="Enter your Email" class="email">
+<div class="Subscribe">Subscibe</div>
+</div>
+</ul>
+</div>
+<div class="foot-panel3">
+<a href="index" class="logo2"></a>
+</div>
+<div class="foot-panel4">
+ <div class="pages">
+<a> Conditions of Use</a>
+<a>Privacy Notice</a>
+<a>Consumer Health Data Privacy Disclosure</a>
+<a>Your Ads Privacy Choices</a>
+ </div>
+ <div class="copyright"> 
+  © 2024-2025,Grow smart.com, Inc. All Right reserved
+ </div>
+</div>
+</footer>
+<script src="index.js">
+</script>
+</body>
+</html>
+
+
+

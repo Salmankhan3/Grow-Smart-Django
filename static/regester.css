@@ -1,0 +1,113 @@
+* {
+  margin: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  background-color: rgb(228, 221, 223);
+}
+
+.login {
+  background-color: rgb(197, 193, 186);
+  width: 500px;
+  margin: 50px auto 100px auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.welcome_text {
+  text-align: center;
+  font-size: 250px;
+  margin-top: 30px;
+}
+
+.icon {
+  text-align: center;
+  font-size: 100px;
+  margin: 40px 0 50px 0;
+}
+
+.name_div,
+.email_div,
+.password_div,
+.confirm_password_div {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.name_div input,
+.email_div input,
+.password_div input,
+.confirm_password_div input {
+  width: 250px;
+  height: 40px;
+  border-radius: 5px;
+  border: solid 2px black;
+  transition: 0.3s;
+}
+
+.name_div input {
+  border-width: 2.5px;
+  margin-right: 35px;
+}
+
+.email_div input {
+  margin-left: 20px;
+}
+
+.password_div input {
+  margin-right: 50px;
+}
+
+.confirm_password_div input {
+  margin-right: 60px;
+}
+
+.name_div input:hover,
+.email_div input:hover,
+.password_div input:hover,
+.confirm_password_div input:hover {
+  background-color: rgb(232, 234, 236);
+  border: solid 3px rgb(212, 145, 68);
+}
+
+.submit-btn,
+.reset-btn {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.submit-btn {
+  margin-top: 56px;
+}
+
+.reset-btn {
+  margin-top: 25px;
+}
+
+.submit-btn input,
+.reset-btn input {
+  height: 40px;
+  width: 130px;
+  border: solid 2px rgb(27, 27, 238);
+  border-radius: 10px;
+  background-color: blueviolet;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.submit-btn input:hover,
+.reset-btn input:hover {
+  background-color: #2d6c91;
+  border: solid 2px rgb(117, 75, 75);
+  transform: scale(1.2);
+}

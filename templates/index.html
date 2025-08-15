@@ -1,0 +1,612 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrowSmart.com</title>
+    <link rel="stylesheet" href="{%static 'style.css'%}">
+    
+    <script src="https://kit.fontawesome.com/a18ae6822d.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a id="top-section" ></a>
+  <header>
+    <div class="navbar">
+      <div class="nav-logo">
+        <a href="index">
+            <div class="logo border"></div>
+            </a>
+      </div>
+         <form name='search' class='search' action="{% url 'search'%}" method='GET'>
+         <div class="search-bar">
+            <select class="search-select">
+                <option>All</option>
+                <option value="fruit">Fruits</option>
+                <option value="Vigitables">Vigitables</option>
+                <option value="seeds">Seeds</option>
+                <option value="Dryfruit">Dryfruit</option>
+            </select>
+            <input placeholder="Search" class="search-input" name='keyword'>
+            <div class="search-icon">
+            <button type="submit" class="search-btn" style="width: 35px; height: 35px; background-color:  rgb(240, 240, 67);  border: none; font-size:20px">
+             <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+           </div>
+
+        </div>
+    </form>
+    
+        <div class='tracker'>
+        <a href='tracker'>Tracker</a>  
+        </div>
+         <div class="login">
+        <a href="product" target="_blank">Shop</a>
+        </div>
+        <div class="login">
+        <a href="login" target="_blank">Login / Regester</a>
+        </div>
+        {% comment %} <div class="regester">
+        <a href="regester" target="_blank">Regester</a>
+        </div> {% endcomment %}
+          <div class="login">
+        <a href="contact" target="_blank">Contact Us</a>
+        </div>
+        <div class="cart">
+        <div class="icon"><i class="fa-solid fa-cart-shopping"></i> 
+        <a href="cart" target="_blank">  Cart </a>
+        </div>
+        </div>
+        </div>
+    </header>
+    <div class="hero-section">
+    <div class="image"><img src="{% static 'images/Fresh-Food_7a9e8440-2c83-4b51-820c-72fa7aa49498.webp'%}" id="m1"></div>
+    <div id="text"><a>You are on Grow Smart.com enjoy your Shoping</a></div>
+    </div>
+  </div>
+   <div id="chatbot-container">
+  <div id="chatbot-text">Hi! i am Kitti how can i help you </div>
+  <div id="chatbot-icon">
+    <i class="fa-brands fa-rocketchat"></i>
+  </div>
+</div>
+<div id="chatbot-window">
+  <iframe   src="https://dull-papayas-find.loca.lt/" frameborder="0" allow="microphone;" title="Chatbot"></iframe>
+</div>
+<div class="catagory-text">
+ <p id="category">Shop By Category</p>
+ </div>
+<div class="catagory-item">
+<div class="fruit c-box">
+    <div class="c-box-content">
+       <a href="Fruit.html" target="_blank"> <div class="c-box-image" style="background-image: url('static/images/Fruits-NEW.jpg');"> </div></a>
+</div>
+</div>
+<div class="Vigitables c-box">
+    <div class="c-box-content">
+       <a href="vegitable.html" target="_blank"><div class="c-box-image" style="background-image: url('static/images/Vegetables-NEW.jpg');"> </div></a>
+</div>
+ </div>
+ <div class="Dryfruit c-box">
+    <div class="c-box-content">
+      <a href="dryfruit.html" target="_blank"><div class="c-box-image" style="background-image: url('static/images/dry\ fruit.png');"> </div></a>
+</div>
+ </div>
+ </div>
+   <div class="shop-section">
+   
+    <div class="box1 box" >
+    <div class="box-content">
+      
+   <div class="box-img" style="background-image: url('static/images/1212541-1.jpg');"></div>
+   <p class="product-name">Fresh Basket China Carrot, 1 KG</p>
+   <p id="price">Rs. 600</p>
+   </div>
+    <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box2 box"  onclick="window.location.href='productpage.html?name=Capsicum%20(Shimlaa)%20Local%20250g&price=60&image=images/1168932-1.jpg';">
+    <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/1168932-1.jpg');"></div>
+   <p class="product-name">Capsicum (Shimlaa) Local 250g</p>
+    <p id="price">Rs. 60</p>
+   </div>
+        <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box3 box" onclick="window.location.href='productpage.html?name=Curry%20Leaves%20(Kari)%20Local%201-Bunch&price=25&image=images/Kari%20pata.jpg';">
+     <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/Kari\ pata.jpg');"></div>
+   <p class="product-name">Curry Leaves (Kari) Local 1-Bunch</p> 
+    <p id="price">Rs. 25</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box4 box" onclick="window.location.href='productpage.html?name=Cabbage%20(Gobi)%20Purple%20Local%20Per%20Piece&price=140&image=images/Gobi.jpg';">
+     <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/Gobi.jpg');"></div>
+   <p class="product-name">Cabbage (Gobi) Purple Local Per Piece</p>
+   <p id="price">Rs. 140</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+    <div class="box1 box" onclick="window.location.href='productpage.html?name=Tomato%20(Tamatar)%201%20KG&price=120&image=images/tomato.jpg';">
+    <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/tomato.jpg');"></div>
+   <p class="product-name">Tomato (Tamatar) 1 KG</p>
+   <p id="price">RS. 120</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box2 box" onclick="window.location.href='productpage.html?name=Fresh%20Basket%20Spinach%20(Palak)%2C%20Leaves&price=95&image=images/spanich.jpg';">
+     <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/spanich.jpg');"></div>
+  <P class="product-name">Fresh Basket Spinach (Palak), Leaves</P>
+  <p id="price">Rs. 95</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box3 box" onclick="window.location.href='productpage.html?name=Guar%20Bean%20500gm%20(Approx)&price=170&image=images/bean.jpg';">
+     <div class="box-content">
+ 
+   <div class="box-img" style="background-image: url('static/images/bean.jpg');"></div>
+   <P class="product-name">Guar Bean 500gm (Approx)
+</P>
+  <p id="price">Rs. 170</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box4 box" onclick="window.location.href='productpage.html?name=Malir%20Chilli%20(Mirchi)%20Local%20250g&price=90&image=images/chili.jpg';">
+     <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/chili.jpg');"></div>
+<P class="product-name">  Malir Chilli (Mirchi) Local 250g</P>
+  <p id="price">Rs. 90</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box1 box" onclick="window.location.href='productpage.html?name=Pineapple%20(Ananas)%2C%20Per%20Piece&price=2900&image=images/ananas.jpg';">
+    <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/ananas.jpg');"></div>
+   <P class="product-name">  Pineapple (Ananas), Per Piece</P>
+  <p id="price">Rs. 2900</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box2 box" onclick="window.location.href='productpage.html?name=Watermelon%20(Tarbooz)%20Local%2C%20Per%20Piece&price=1150&image=images/watermillon.jpg';"
+>
+     <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/watermillon.jpg');"></div>
+   <P class="product-name">  Watermelon (Tarbooz) Local, Per Piece</P>
+  <p id="price">Rs. 1,150</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box3 box" onclick="window.location.href='productpage.html?name=Fresh%20Basket%20Green%20Grapes%2C%20Local%2C%201%20KG&price=2200&image=images/grapes.jpg';">
+     <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/grapes.jpg');"></div>
+    <P class="product-name"> Fresh Basket Green Grapes, Local, 1 KG
+</P>
+  <p id="price">Rs. 2,200</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box4 box" onclick="window.location.href='productpage.html?name=Peach%20Local%2C%20500g%20(Approx)&price=700&image=images/peach.jpg';">
+     <div class="box-content">
+ 
+   <div class="box-img" style="background-image: url('static/images/peach.jpg');"></div>
+ <p class="product-name"> Peach Local, 500g (Approx)</p>
+<p id="price">Rs. 700</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+    <div class="box1 box" onclick="window.location.href='productpage.html?name=Cherry%20Local%2C%201-Pack&price=450&image=images/cheery.jpg';">
+    <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/cheery.jpg');"></div>
+   <P class="product-name">  Cherry Local, 1-Pack</P>
+  <p id="price">Rs. 450</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box2 box" onclick="window.location.href='productpage.html?name=Mango%20Sindhri%2C%201%20KG%20(Approx)&price=560&image=images/mango.jpg';">
+     <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/mango.jpg');"></div>
+   <P class="product-name"> Mango Sindhri, 1 KG (Approx)
+</P>
+  <p id="price">Rs. 560</p>
+   </div>
+     <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box3 box" onclick="window.location.href='productpage.html?name=Imported%20Dragon%20Fruit%2C%201%20Piece&price=200&image=images/dragon.jpg';">
+     <div class="box-content">
+  
+   <div class="box-img" style="background-image: url('static/images/dragon.jpg');"></div>
+    <P class="product-name"> Imported Dragon Fruit, 1 Piece
+</P>
+  <p id="price">Rs. 200</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box4 box" onclick="window.location.href='productpage.html?name=Plum%20(Aloo%20Bukhara)%20Local%2C%20500g%20(Approx)&price=350&image=images/plum.jpg';">
+     <div class="box-content">
+ 
+   <div class="box-img" style="background-image: url('static/images/plum.jpg');"></div>
+ <p class="product-name"> Plum (Aloo Bukhara) Local, 500g (Approx)</p>
+<p id="price">Rs. 350</p>
+   </div>
+     <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+       <div class="box1 box" onclick="window.location.href='productpage.html?name=Nature%27s%20Bar%20Dried%20Pineapple%2C%20250g&price=1450&image=images/pinapple.jpg';">
+    <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/pinapple.jpg');"></div>
+   <P class="product-name">  Nature's Bar Dried Pineapple, 250g</P>
+  <p id="price">Rs. 1450</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box2 box" onclick="window.location.href='productpage.html?name=Nice%20Till%20Kai%20Laddu%20(Sesame%20Balls)%2C%2010-Pack&price=120&image=images/laddu.jpg';">
+     <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/laddu.jpg');"></div>
+   <P class="product-name">Nice Till Kai Laddu (Sesame Balls), 10-Pack
+</P>
+  <p id="price">Rs. 120</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box3 box" onclick="window.location.href='productpage.html?name=Naheed%20Kishmish%20(Raisins)%20100g&price=1680&image=images/raisins.jpg';">
+     <div class="box-content">
+  
+   <div class="box-img" style="background-image: url('static/images/raisins.jpg');"></div>
+    <P class="product-name">Naheed Kishmish (Raisins) 100g
+</P>
+  <p id="price">Rs. 1680</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box4 box" onclick="window.location.href='productpage.html?name=Royal%20Shamsi%20Arabian%20Dates%2C%20Gift%20Box%2C%201kg&price=500&image=images/Arabiandates.jpg';">
+     <div class="box-content">
+ 
+   <div class="box-img" style="background-image: url('static/images/Arabiandates.jpg');"></div>
+ <p class="product-name"> Royal Shamsi Arabian Dates, Gift Box, 1kg</p>
+<p id="price">Rs. 500</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+      <div class="box1 box" onclick="window.location.href='productpage.html?name=S.N%20Rabia%20Standard%20Fresh%20Dates%2C%201%20KG&price=3620&image=images/dates.jpg';">
+    <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/dates.jpg');"></div>
+   <P class="product-name">  S.N Rabia Standard Fresh Dates, 1 KG</P>
+  <p id="price">Rs. 3620</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box2 box" onclick="window.location.href='productpage.html?name=American%20Badam%20(Almond)%20500g(Approx)&price=3000&image=images/almond.jpg';">
+     <div class="box-content">
+   
+   <div class="box-img" style="background-image: url('static/images/almond.jpg');"></div>
+   <P class="product-name"> American Badam (Almond) 500g(Approx)
+</P>
+  <p id="price">Rs. 3000</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box3 box" onclick="window.location.href='productpage.html?name=Fresh%20Basket%20Cashew%20(Kajoo)%2C%20Wasabi%2C%20200g&price=1550&image=images/kajoo.jpg';">
+     <div class="box-content">
+  
+   <div class="box-img" style="background-image: url('static/images/kajoo.jpg');"></div>
+    <P class="product-name">Fresh Basket Cashew (Kajoo), Wasabi, 200g
+</P>
+  <p id="price">Rs. 1550</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box4 box" onclick="window.location.href='productpage.html?name=Naheed%20Bhunnay%20Channa%20Chilka%20(Chickpeas)%2C250g&price=520&image=images/channa.jpg';">
+     <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/channa.jpg');"></div>
+ <p class="product-name">Naheed Bhunnay Channa Chilka (Chickpeas),250g</p>
+<p id="price">Rs. 520</p>
+     <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   </div>
+   </div>
+   {% comment %} this is from db {% endcomment %}
+   <div class="shop-section">
+  {% for product in products %}
+  <div class="box" onclick="window.location.href='{% url 'productdisplay' product.id %}'">
+    <div class="box-content">
+      <div class="box-img" style="background-image: url('{{ product.image.url }}');"></div>
+      <p class="product-name">{{ product.name }}</p>
+      <p id="price">Rs. {{ product.price }}</p>
+       <form  action="{% url 'add_carts' product.id %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="quantity" value="1">
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <button type="submit" class="icon-button" style="cursor:pointer;border-radius:50px;border-color:#4169E1;height:42px;width:42px;background-color:#A2DEE9;"   onclick="event.stopPropagation();"><i class="fa-solid fa-cart-shopping add-to-cart-icon" style=" transform: translate(-20%,-4px);color:#0F0FD1;"></i></button>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+</form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+   {% comment %} this is end of db {% endcomment %}
+
+</div>
+<section id="Frsehproducts">
+  <h3>Fresh Products</h3>
+  <div class="video">
+  <video src="static/images/video.mp4" autoplay muted loop></video>
+  <video src="static/images/1230-144234732_small.mp4" autoplay muted loop></video>
+  </div>
+</section>
+
+<footer>
+    <div class="navfooterbacktotoptext">
+        <a href="#top-section"><p>Back to top</p></a> 
+    </div>
+    <div class="foot-panel2">
+      <ul>
+        <p>Contact Details</p>
+        <a> <i class="fa-solid fa-location-dot"></i> Ring road peshawar</a>
+        <a>
+       <a><i class="fa-solid fa-phone">(092)3189398866</i> </a>
+        <a>Customer Support: 7 Days a Week, 9:00am - 10:00pm </a>
+        <div class="social-media">
+  <a href="https:\\www.facebook.com" class="fa-facebook social-m"><i class="fa-brands fa-facebook"></i></a>
+  <a href="https:\\www.instagram.com"class="instagram social-m"><i class="fa-brands fa-instagram"></i></a>
+  <a href="https:\\www.youtube.com"  class="youtube social-m"><i class="fa-brands fa-youtube"></i></a>
+  <a href="https:\\www.tiktok.com"   class="tiktok social-m"><i class="fa-brands fa-tiktok"></i>
+        </a>
+        </div>
+      </ul>
+<ul>	
+<p>Customer Services</p>
+<a href="index.html" class="contact">
+  Contact Us
+  <span class="hover-text">Contact Us</span>
+</a>
+
+<a>FAQs</a>
+</ul>
+<ul>
+<p>Information</p>
+<a>Return & Refund</a>
+<a>Privacy Policy</a>
+<a>Terms & Conditions </a>
+</ul>
+<ul>
+<p>Subscribe our Newsletter</p>
+<a>Get the latest offers and promotions!</a>
+<div class="Newsletter">
+<input placeholder="Enter your Email" class="email">
+<div class="Subscribe">Subscibe</div>
+</div>
+</ul>
+</div>
+<div class="foot-panel3">
+<a href="index.html" class="logo2"></a>
+</div>
+<div class="foot-panel4">
+ <div class="pages">
+<a> Conditions of Use</a>
+<a>Privacy Notice</a>
+<a>Consumer Health Data Privacy Disclosure</a>
+<a>Your Ads Privacy Choices</a>
+ </div>
+ <div class="copyright"> 
+  © 2024-2025,Grow smart.com, Inc. All Right reserved
+ </div>
+</div>
+</footer>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  const container = document.querySelector('.shop-section');
+      const products = JSON.parse(localStorage.getItem('userProducts')) || [];
+
+      products.forEach((product, index) => {
+        const box = document.createElement('div');
+        box.className = 'box';
+        box.onclick = () => {
+          const query = `productpage.html?name=${encodeURIComponent(product.name)}&price=${product.price}&image=${encodeURIComponent(product.image)}`;
+          window.location.href = query;
+        };
+        box.innerHTML = `
+          <div class="box-img" style="background-image: url('${product.image}');"></div>
+          <p class="product-name" style="color: #170388;font-weight: 600;font-size: 15px; margin-left: 10px">${product.name}</p>
+          <p id="price" style="margin-top: 24px;color: #2D2E2Efc; font-weight:600; margin-left: 10px">Rs. ${product.price}</p>
+          <div class="add-to-cart">
+          <div class=" tooltip">
+          <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+          <span class="tooltip-text">Add to Cart</span>
+      </div>
+      </div>
+      </div>
+        `;
+        container.appendChild(box);
+      });
+  const addtocart_btns = document.querySelectorAll(".add-to-cart-icon");
+
+  if (addtocart_btns.length === 0) {
+    console.warn("No 'add to cart' icons found");
+    return;
+  }
+
+  addtocart_btns.forEach(btn => {
+    btn.addEventListener("click", (event) => {
+      event.stopPropagation(); 
+
+      const box = btn.closest(".box"); //  Get the parent box
+
+      const name = box.querySelector(".product-name").innerText;
+      const priceText = box.querySelector("#price").innerText; // e.g. "Rs. 600"
+      const price = priceText.split(" ")[1]; // "600"
+
+      const bgImageStyle = box.querySelector(".box-img").style.backgroundImage;
+      const imageUrl = bgImageStyle.slice(5, -2); // remove url('...') wrapper
+      const imageurl2="http://127.0.0.1:8000/"+imageUrl
+      console.log(imageurl2)
+      // Create a product object
+      const product = {
+        name,
+        price,
+        quantity: 1, // default to 1
+        image: imageurl2,
+        subtotal: Number(price),
+      };
+
+      // Get current cart from localStorage
+      const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+
+      // Add new product
+      cartItems.push(product);
+
+      // Save to localStorage
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      alert("item added succesfully")
+
+  
+    });
+  });
+// product from former.html
+ 
+});
+//localStorage.clear();
+// logic for chat bot
+  const chatIcon = document.getElementById('chatbot-icon');
+  const chatbotWindow = document.getElementById('chatbot-window');
+
+  chatIcon.addEventListener('click', () => {
+    chatbotWindow.style.display = chatbotWindow.style.display === 'none' || chatbotWindow.style.display === '' 
+      ? 'block' 
+      : 'none';
+        });
+</script>
+</body>
+</html>

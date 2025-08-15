@@ -1,0 +1,584 @@
+{% load dict_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Former Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .alert-messages{
+            margin-left: 400px; 
+            margin-top: 70px; 
+            margin-bottom: 30px;
+            height: 70px;width:40%;
+            background-color:rgba(151, 38, 38, 0.1); 
+            border-radius:10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 24px 32px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: between;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            flex-grow: 1;
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .dashboard-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .section-content {
+            padding: 24px;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* Products Section */
+        .products-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .product-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .product-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+
+        .product-image img{
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .product-info {
+            flex-grow: 1;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .product-description {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .product-price {
+            font-weight: 700;
+            color: #3b82f6;
+            font-size: 18px;
+        }
+
+        /* Orders Section */
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            gap: 16px;
+        }
+
+        .order-info {
+            flex-grow: 1;
+        }
+
+        .order-number {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .buyer-name {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .order-amount {
+            font-weight: 700;
+            color: #059669;
+            font-size: 16px;
+            margin-right: 16px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-processing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Received Orders Section */
+        .received-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .received-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .shipment-icon {
+            width: 40px;
+            height: 40px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #3b82f6;
+        }
+
+        .shipment-info {
+            flex-grow: 1;
+        }
+
+        .tracking-id {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+            margin-bottom: 4px;
+            font-family: monospace;
+        }
+
+        .shipment-date {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        /* Contact Admin Section */
+        .contact-admin {
+            grid-column: 1 / -1;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .contact-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .admin-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .admin-details {
+            flex-grow: 1;
+        }
+
+        .admin-name {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 2px;
+        }
+
+        .admin-role {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+        }
+
+        .contact-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .help-text {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        /* Stats Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .container {
+                padding: 16px;
+            }
+        }
+       
+    </style>
+</head>
+<body>
+      {% if messages %}
+    <div class="alert-messages" id="alert-box">
+        {% for msg in messages %}
+            <div class="alert 
+                {% if msg.tags == 'success' %}alert-success
+                {% elif msg.tags == 'error' %}alert-error
+                {% endif %}
+            ">
+                {{ msg }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Former Dashboard</h1>
+            <div class="header-info">
+                <span>Welcome back, {{full_name}}</span>
+                <div class="user-avatar"> {{name}}</div>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-value">{{activeproducts}}</div>
+                <div class="stat-label">Active Products</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{all_orders}}</div>
+                <div class="stat-label">Total Orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">Rs. {{revenue}}</div>
+                <div class="stat-label">Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{pending_count}}</div>
+                <div class="stat-label">Pending Shipments</div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Products Section -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">My Products</h2>
+                    <button class="btn-primary" onclick='window.location.href="{% url 'addproduct' %}"'>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Product
+                    </button>
+                </div>
+                <div class="section-content">
+                    <div class="products-list">
+                        {% for product in user_products%}
+                        <div class="product-item">
+                            
+                            <div class="product-image"><img src="{{product.image.url}}"></div>
+                            <div class="product-info">
+                                <div class="product-name">{{product.name}}</div>
+                                <div class="product-description">{{product.desc}}</div>
+                            </div>
+                            <div class="product-price">Rs. {{product.price}}</div>
+                            
+                        </div>
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Orders Section -->
+            <div class="dashboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Orders</h2>
+                    <button class="btn-secondary" onclick='window.location.href="{% url 'farmer_orders' %}"'>View All</button>
+                </div>
+                <div class="section-content">
+                    <div class="orders-list">
+                        {% for order in orders %}
+                        <div class="order-item">
+                            <div class="order-info">
+                                <div class="order-number">order# {{order.order_id}}</div>
+                                <div class="buyer-name">{{order.name}}</div>
+                            </div>
+                            <div class="order-amount">Rs. {{ order_totals|get_item:order.order_id }}</div>
+                            <div class="status-badge status-completed">{{ order_statuses|get_item:order.order_id }}</div>
+                        </div>
+                        {% endfor %}
+                        </div>
+                </div>
+            </div>
+
+                </div>
+
+            <!-- Contact Admin Section -->
+            <div class="dashboard-section contact-admin">
+                <div class="section-header">
+                    <h2 class="section-title">Contact Admin</h2>
+                </div>
+                <div class="section-content">
+                    <div class="contact-info">
+                        <div class="admin-avatar">AS</div>
+                        <div class="admin-details">
+                            <div class="admin-name">Admin Support</div>
+                            <div class="admin-role">Available 24/7 for assistance</div>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-form">
+                        <form name='contact' method="POST" action='{% url 'farmer' %}'>
+                            {% csrf_token %}
+                        <textarea class="message-input" name='message-text' placeholder="Type your message here... We're here to help with any questions or issues you might have."></textarea>
+                        <div class="contact-actions">
+                            <div class="help-text">Response time: Usually within 2 hours</div>
+                            <button class="btn-primary" type=submit>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                                </svg>
+                                Send Message
+                            </button>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    setTimeout(function() {
+        let alertBox = document.getElementById('alert-box');
+        if (alertBox) {
+            alertBox.style.transition = "opacity 0.5s ease";
+            alertBox.style.opacity = 0;
+            setTimeout(() => alertBox.remove(), 500);
+        }
+    }, 2000);
+</script>
+</body>
+</html>

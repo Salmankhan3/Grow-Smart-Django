@@ -1,0 +1,333 @@
+{%load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrowSmart.com</title>
+    <link rel="stylesheet" href="{%static 'style.css'%}">
+    
+    <script src="https://kit.fontawesome.com/a18ae6822d.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a id="top-section" ></a>
+    <header>
+        <div class="navbar">
+             <div class="nav-logo">
+            <a href="index">
+            <div class="logo border"></div>
+            </a>
+             </div>
+        <div class="address border">
+          <p class="add-first"> Delever to</p>  
+        <div class="add-icon">
+         <i class="fa-solid fa-location-dot"></i>
+        <P class="add-second">  Pakistan</P>
+        </div>
+        </div>
+         <div class="search-bar">
+            <select class="search-select">
+                <option>All</option>
+                <option>Fruits</option>
+                <option>Vigitables</option>
+                <option>Seeds</option>
+                <option>Dryfruit</option>
+            </select>
+            <input placeholder="Search" class="search-input">
+            <div class="search-icon">
+                <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        </div>
+        <div class="login">
+        <a href="login" target="_blank">Login</a>
+        </div>
+        <div class="regester">
+        <a href="regester" target="_blank">Regester</a>
+        </div>
+        <div class="cart">
+        <div class="icon"><i class="fa-solid fa-cart-shopping"></i> 
+        <a href="cart.html" target="_blank">  Cart </a>
+        </div>
+        </div>
+        </div>
+    </header>
+  </div>
+   <div id="chatbot-container">
+  <div id="chatbot-text">Hi! i am Kitti how can i help you </div>
+  <div id="chatbot-icon">
+    <i class="fa-brands fa-rocketchat"></i>
+  </div>
+</div>
+<div id="chatbot-window">
+  <iframe 
+    src="index2.html" frameborder="0" allow="microphone;" title="Chatbot"></iframe>
+</div>
+<section id="prodetails" id="section-p1">
+    <div class="single-pro-img">
+        <img src="{%static 'images/kari pata.jpg'%}" width="550" id="main-img" alt="kari pata">
+    <div class="small-img-group">
+        <div class="small-img-col">
+            <img src="{% static 'images/plum.jpg'%}" width="100%" class="small-img" alt="smallimg">
+        </div>
+        <div class="small-img-col">
+            <img src="{% static '/images/kari pata.jpg'%} " width="100%" class="small-img" alt="small-img">
+        </div>
+        <div class="small-img-col">
+            <img src="{% static '/images/kari pata.jpg'%}" width="100%" class="small-img" alt="small-img">
+        </div>
+        <div class="small-img-col">
+        <img src="{% static '/images/kari pata.jpg'%}" width="100%" class="small-img" alt="small-img">
+        </div>
+    </div>
+    </div>
+    <div class="single-pro-detail">
+        <p>home > product</p>
+        <h4 id="product-name">Curry Leaves (Kari Patta) Local 1-Bunch</h4>
+        <h2 id="product-price">Rs 150</h2>
+        <hr>
+        <ul style="list-style-type: none; padding-bottom: 50px;padding-top: 30px;">
+        <li class="Stock" style="display: flex; align-items: center; gap: 5px;margin-bottom: 8px;">
+            <p id="stock1">Stock:</p>  <i class="fa-solid fa-check"></i><p id="stock2">In stock</p>
+        </li>
+        <li class="ship" style="display: flex; align-items: center; gap: 5px;margin-bottom: 8px;">
+           <p>Ships in:</p><p style="font-weight: 500;">24 Hour</p>
+        </li>
+        <li class="delevery" style="display: flex; align-items: center; gap: 5px;margin-bottom: 8px;">
+            <p>Delever Area:</p><p style="font-weight: 500;" 500;>Peshawar only</p>
+        </li>
+        <li class="delever by" style="display: flex; align-items: center; gap: 5px;margin-bottom: 8px;">
+            <p>Delever By:</p><p style="font-weight: 500;" 500;>Grow-Smart.com</p>
+        </li>
+        </ul>
+        <input type="number" class="item_count" value="1">
+        <button class="addtocart">Add to Cart</button>
+    </div>
+</section>
+<p id="related-product">Feature Products</p>
+<div class="shop-section">
+
+    <div class="box1 box" onclick="window.location.href='productpage.html?name=Carrot&price=600&image=images/1212541-1.jpg';">
+    <div class="box-content">
+      
+   <div class="box-img" style="background-image: url('static/images/1212541-1.jpg');"></div>
+   <p class="product-name">Fresh Basket China Carrot, 1 KG</p>
+   <p id="price">Rs. 600</p>
+   </div>
+    <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box2 box"  onclick="window.location.href='productpage.html?name=Capsicum%20(Shimlaa)%20Local%20250g&price=60&image=images/1168932-1.jpg';">
+    <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/1168932-1.jpg');"></div>
+   <p class="product-name">Capsicum (Shimlaa) Local 250g</p>
+    <p id="price">Rs. 60</p>
+   </div>
+        <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box3 box" onclick="window.location.href='productpage.html?name=Curry%20Leaves%20(Kari)%20Local%201-Bunch&price=25&image=images/Kari%20pata.jpg';">
+     <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/Kari\ pata.jpg');"></div>
+   <p class="product-name">Curry Leaves (Kari) Local 1-Bunch</p> 
+    <p id="price">Rs. 25</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box4 box" onclick="window.location.href='productpage.html?name=Cabbage%20(Gobi)%20Purple%20Local%20Per%20Piece&price=140&image=images/Gobi.jpg';">
+     <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/Gobi.jpg');"></div>
+   <p class="product-name">Cabbage (Gobi) Purple Local Per Piece</p>
+   <p id="price">Rs. 140</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+    <div class="box1 box" onclick="window.location.href='productpage.html?name=Tomato%20(Tamatar)%201%20KG&price=120&image=images/tomato.jpg';">
+    <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/tomato.jpg');"></div>
+   <p class="product-name">Tomato (Tamatar) 1 KG</p>
+   <p id="price">RS. 120</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box2 box" onclick="window.location.href='productpage.html?name=Fresh%20Basket%20Spinach%20(Palak)%2C%20Leaves&price=95&image=images/spanich.jpg';">
+     <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/spanich.jpg');"></div>
+  <P class="product-name">Fresh Basket Spinach (Palak), Leaves</P>
+  <p id="price">Rs. 95</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box3 box" onclick="window.location.href='productpage.html?name=Guar%20Bean%20500gm%20(Approx)&price=170&image=images/bean.jpg';">
+     <div class="box-content">
+ 
+   <div class="box-img" style="background-image: url('static/images/bean.jpg');"></div>
+   <P class="product-name">Guar Bean 500gm (Approx)
+</P>
+  <p id="price">Rs. 170</p>
+   </div>
+       <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+   <div class="box4 box" onclick="window.location.href='productpage.html?name=Malir%20Chilli%20(Mirchi)%20Local%20250g&price=90&image=images/chili.jpg';">
+     <div class="box-content">
+   <div class="box-img" style="background-image: url('static/images/chili.jpg');"></div>
+<P class="product-name">  Malir Chilli (Mirchi) Local 250g</P>
+  <p id="price">Rs. 90</p>
+   </div>
+      <div class="add-to-cart">
+      <div class=" tooltip">
+  <i class="fa-solid fa-cart-shopping add-to-cart-icon"></i>
+  <span class="tooltip-text">Add to Cart</span>
+      </div>
+</div>
+   </div>
+  </div>
+
+<footer>
+    <div class="navfooterbacktotoptext">
+        <a href="#top-section"><p>Back to top</p></a> 
+    </div>
+    <div class="foot-panel2">
+      <ul>
+        <p>Contact Details</p>
+        <a> <i class="fa-solid fa-location-dot"></i> Ring road peshawar</a>
+        <a>
+       <a><i class="fa-solid fa-phone">(092)3189398866</i> </a>
+        <a>Customer Support: 7 Days a Week, 9:00am - 10:00pm </a>
+        <div class="social-media">
+  <a href="https:\\www.facebook.com" class="fa-facebook social-m"><i class="fa-brands fa-facebook"></i></a>
+  <a href="https:\\www.instagram.com"class="instagram social-m"><i class="fa-brands fa-instagram"></i></a>
+  <a href="https:\\www.youtube.com"  class="youtube social-m"><i class="fa-brands fa-youtube"></i></a>
+  <a href="https:\\www.tiktok.com"   class="tiktok social-m"><i class="fa-brands fa-tiktok"></i>
+        </a>
+        </div>
+      </ul>
+<ul>	
+<p>Customer Services</p>
+<a href="index.html" class="contact">
+  Contact Us
+  <span class="hover-text">Contact Us</span>
+</a>
+<a>FAQs</a>
+</ul>
+<ul>
+<p>Information</p>
+<a>Return & Refund</a>
+<a>Privacy Policy</a>
+<a>Terms & Conditions/a>
+</ul>
+<ul>
+<p>Subscribe our Newsletter</p>
+<a>Get the latest offers and promotions!</a>
+<div class="Newsletter">
+<input placeholder="Enter your Email" class="email">
+<div class="Subscribe">Subscibe</div>
+</div>
+</ul>
+</div>
+<div class="foot-panel3">
+<a href="index.html" class="logo2"></a>
+</div>
+<div class="foot-panel4">
+ <div class="pages">
+<a> Conditions of Use</a>
+<a>Privacy Notice</a>
+<a>Consumer Health Data Privacy Disclosure</a>
+<a>Your Ads Privacy Choices</a>
+ </div>
+ <div class="copyright"> 
+  © 2024-2025,Grow smart.com, Inc. All Right reserved
+ </div>
+</div>
+</footer>
+<script>
+    var main_img=document.querySelector("#main-img");
+    var small_img=document.querySelectorAll(".small-img");
+    small_img[0].onclick=()=>{
+        main_img.src=small_img[0].src
+    }
+    small_img[1].onclick=()=>{
+        main_img.src=small_img[1].src
+    }
+    small_img[2].onclick=()=>{
+        main_img.src=small_img[2].src
+    }
+    small_img[3].onclick=()=>{
+        main_img.src=small_img[3].src
+    }
+    var btn=document.querySelector(".addtocart");
+    var item_count=document.querySelector(".item_count")
+    btn.addEventListener("click",()=>{
+        if(item_count.value<=0){
+            alert("please add Item");
+        }
+       
+    })
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get('name');
+    const price = params.get('price');
+    const image = params.get('image');
+    if (name && price && image) {
+    document.getElementById("product-name").innerText = name;
+    document.getElementById("product-price").innerText = `Rs. ${price}`;
+    document.getElementById("main-img").src = image;
+    document.querySelectorAll(".small-img")[0].src=image;
+    document.querySelectorAll(".small-img")[1].src=image;
+    document.querySelectorAll(".small-img")[2].src=image;
+    document.querySelectorAll(".small-img")[3].src=image;
+  }
+const addtocart_btn = document.querySelector(".addtocart"); 
+addtocart_btn.addEventListener("click", () => {
+  const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+  const name=document.getElementById("product-name").innerText;
+  const price =document.getElementById("product-price").innerText.split(" ")[1];
+  const quantity=document.querySelector(".item_count").value;
+  const image=document.getElementById("main-img").src;
+  console.log("img==" + image)
+  const product = {
+    name,
+    price,
+    quantity,
+    image,
+    subtotal: Number(price) * Number(quantity)
+  };
+  cartItems.push(product);
+  localStorage.setItem("cartItems", JSON.stringify(cartItems));
+ // window.location.href = "cart.html";
+});
+</script>
+<script src="index.js"></script>
+</body>
+</html>

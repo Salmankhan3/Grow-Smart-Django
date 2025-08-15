@@ -1,0 +1,40 @@
+from django.contrib import admin
+from django.urls import path
+from home import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('',views.index,name='home_page'),
+    path('index',views.index,name='index'),
+    path('static',views.static,name='static_file'),
+    path('login/',views.loginuser,name='login'),
+    path('login/register.html',views.regester_user,name='regester'),
+    path('regester/',views.regester_user,name='regester'),
+    path('cart/',views.cart,name='cart'),
+    path('checkout/',views.checkout,name='checkout'),
+    path('productpage/',views.productpage,name='productpage'),
+    path('Fruit.html',views.fruit,name='fruit-catagory'),
+    path('vegitable.html',views.vegitable,name='vegitable-catagory'),
+    path('dryfruit.html',views.dryfruit,name='dryfruit-catagory'),
+    path('addproduct',views.addproduct,name='addproduct'),
+    path('product/delete/<int:pk>/', views.delete_product, name='delete_product'),
+    path('delete/<int:pk>/', views.delete_product, name='delete_product'),
+    path('product/cart.html',views.product_cart,name='product/cart.html'),
+    path('product/checkout.html',views.product_checkout,name='product_checkout'),
+    path('contact',views.contact,name='contact'),
+    path('cart/checkout.html',views.checkout,name='checkout'),
+    path('product/',views.pro,name='product'),
+    path('product/<int:myid>/', views.productdisplay, name='productdisplay'),
+    path('checkout/cart.html/',views.cart),
+    path('tracker/',views.tracker,name='tracker'),
+    path('search',views.search,name='search'),
+    path('add_cart/<int:product_id>/',views.add_cart,name='add_carts'),
+    path('checkout/success/', views.checkout_success, name='checkout_success'),
+    path('checkout/cancel/', views.checkout_cancel, name='checkout_cancel'),
+    path('add_cartcart/checkout',views.checkout,name='checkout'),
+    path('remove_cart',views.remove_cart,name='remove_cart'),
+    path('farmer',views.former,name='farmer'),
+    path('farmer_orders',views.farmer_orders,name='farmer_orders'),
+    path('update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
+    
+]

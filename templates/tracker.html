@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tracker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #e0dada;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .checkout-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      margin-top: 100px;
+      flex-wrap: wrap;
+      width: 50%;
+      margin-left: 330px;
+    }
+
+    .billing-details {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .billing-details input {
+      width: 98%;
+      padding: 10px;
+      margin: 8px 0 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 20px;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    .btn:hover {
+      background: #218838;
+    }
+
+    .order_status {
+      max-width: 630px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: rgb(229, 229, 236);
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .list-group {
+      list-style: none;
+      padding-left: 10px;
+    }
+
+    .list-group-item {
+      background-color: #f9f9f9;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 5px solid #28a745;
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .list-group-item:hover {
+      background-color: #eefaf0;
+    }
+
+    .update-text {
+      flex: 1;
+      text-align: left;
+    }
+
+    .badge-pill {
+      background-color: #8eb397;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 50px;
+      font-size: 14px;
+      text-align: center;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Track Your Order</h2>
+  <form id="tracker-form" method="POST" action="">
+    {% csrf_token %}
+    <div class="checkout-container">
+      <div class="billing-details">
+        <h3>Billing Details</h3>
+        <input type="number" placeholder="Enter order ID" id="order_id" name="order_id" required>
+        <input type="email" placeholder="Email Address" id="email" name="email" required>
+        <button type="submit" class="btn" id="track-order-btn">Track Order</button>
+      </div>
+    </div>
+  </form>
+
+  <div class="order_status">
+    <h2>Order Status</h2>
+    <ul class="list-group" id="item"></ul>
+  </div>
+
+  {% block js %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    document.getElementById("tracker-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      document.getElementById("item").innerHTML = "";
+
+      const orderId = document.getElementById("order_id").value;
+      const email = document.getElementById("email").value;
+      const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+      fetch("", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "X-CSRFToken": csrfToken
+        },
+        body: new URLSearchParams({
+          order_id: orderId,
+          email: email
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.length > 0) {
+          data.forEach(update => {
+            const li = document.createElement("li");
+            li.className = "list-group-item";
+            li.innerHTML = `
+              <span class="update-text">${update.text}</span>
+              <span class="badge-pill">${update.time}</span>
+            `;
+            document.getElementById("item").appendChild(li);
+          });
+        } else {
+          const li = document.createElement("li");
+          li.className = "list-group-item";
+          li.innerHTML = `<span class="update-text">Sorry, we couldn't find updates for this Order ID and Email.</span>`;
+          document.getElementById("item").appendChild(li);
+        }
+      });
+    });
+  </script>
+  {% endblock %}
+</body>
+</html>

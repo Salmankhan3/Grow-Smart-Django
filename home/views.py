@@ -1,0 +1,556 @@
+from django.shortcuts import render,redirect,get_object_or_404
+from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+import json
+from datetime import date
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
+from home.models import Product
+from home.models import Order
+from home.models import OrderUpdate,Cart,CartItem,Contact,UserProfile
+from django.db.models import Q
+from django.conf import settings
+import stripe
+from django.views.decorators.csrf import csrf_exempt
+import re
+from decimal import Decimal
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+# Create your views here.
+
+def index(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    context={
+        'products':Product.objects.all()
+    }
+    return render(request,'index.html',context)
+
+
+def static(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    return render(request,'static.txt')
+
+def loginuser(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        print(f"username: {username}, password: {password}")
+
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            print(f"Authenticated user: {user.username}")
+            try:
+                cart_id = _cart_id(request)
+                print(f"Session Cart ID: {cart_id}")
+                session_cart = Cart.objects.get(cart_id=cart_id)
+                session_cart_items = CartItem.objects.filter(cart=session_cart)
+                print(f"Found {session_cart_items.count()} items in session cart")
+                for item in session_cart_items:
+                    print(f"Assigning item {item.product.name} to user {user.username}")
+                    CartItem.objects.filter(id=item.id).update(user=user)
+                    item.save()
+            except Cart.DoesNotExist:
+                print("No session cart found.")
+
+            login(request, user)
+            try:
+                profile = UserProfile.objects.get(user=user)
+                print("User type: ",profile.userType)
+                if profile.userType == 'farmer':
+                    return redirect('farmer')  
+                elif profile.userType == 'exporter':
+                    return redirect('index')  
+                else:
+                    pass
+            except UserProfile.DoesNotExist:
+                print("User profile not found.")
+                pass
+        else:
+            print('Invalid credentials')
+            return render(request, 'login.html', {'error': 'Invalid username or password'})
+    return render(request, 'login.html')
+
+def regester_user(request):
+     if request.method == 'POST':
+        name=request.POST.get('name')
+        email=request.POST.get('mail')
+        password=request.POST.get('password')
+        usertype=request.POST.get('usertype')
+        if usertype not in ['farmer', 'exporter']:
+            return render(request, 'regester.html', {'error': 'Please select a valid user type.'})
+        print(usertype)
+        # Check if username or email already exists
+        username = email.split('@')[0]
+        # Check if username or email already exists
+        if User.objects.filter(username=name).exists():
+            return render(request, 'regester.html', {'error': 'Username already exists.'})
+        elif User.objects.filter(email=email).exists():
+            return render(request, 'regester.html', {'error': 'Email is already registered.'})
+        
+        try:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=name
+            )
+            UserProfile.objects.create(user=user, userType=usertype)
+            messages.success(request, "Regestration sucessful.")
+            return redirect('login')  
+        except IntegrityError:
+            return render(request, 'regester.html', {'error': 'User registration failed due to a server error.'})
+     return render(request,'regester.html')
+
+
+
+
+
+def _cart_id(request):       #privatefunction to create cart_id based on session key
+    cart=request.session.session_key
+    if not cart:
+        cart=request.session.create()
+    return cart
+def add_cart(request,product_id):
+    if request.user.is_anonymous:
+        return redirect('login')
+    quantity = int(request.POST.get('quantity', 1))
+    product=Product.objects.get(id=product_id)   # get product
+    try:
+        cart=Cart.objects.get(cart_id=_cart_id(request)) # get cart based on cart_id present in session
+    except:
+        if Cart.DoesNotExist:
+            cart=Cart.objects.create(cart_id=_cart_id(request))
+        cart.save()
+    try:
+        cartitem=CartItem.objects.get(product=product,cart=cart)
+        cartitem.quantity+=1
+        messages.success(request, f"Updated quantity for {product.name}.")
+    except:
+        if CartItem.DoesNotExist:
+            if request.user.is_authenticated:
+                user = request.user
+            else:
+                user = None
+            cartitem=CartItem.objects.create(user=user,product=product,quantity=quantity,cart=cart)
+            messages.success(request, f"Added {product.name} to cart.")
+        cartitem.save()
+    return redirect('cart')
+def remove_cart(request):
+    if request.method == "POST":
+        product_id = request.POST.get('product_id')
+        try:
+            cart_item = CartItem.objects.filter(user=request.user, product_id=product_id)
+            cart_item.delete()
+            print("Deleted successfully")
+        except CartItem.DoesNotExist:
+            print("No matching cart item found for user:", request.user)
+    
+    return redirect('cart')
+
+def cart(request, total=0, quantity=0, cart_items=None):
+    if request.user.is_anonymous:
+        return redirect('login')
+    try:
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+
+        if request.user.is_authenticated:
+            # Show only items associated with this user
+            cart_items = CartItem.objects.filter(cart=cart, user=request.user, is_active=True)
+        else:
+            # Show session-based items for guests
+            cart_items = CartItem.objects.filter(cart=cart, user=None, is_active=True)
+
+        for cart_item in cart_items:
+            total += (cart_item.product.price * cart_item.quantity)
+            quantity += cart_item.quantity
+            cart_item.subtotal=cart_item.product.price * cart_item.quantity
+    except ObjectDoesNotExist:
+        cart_items = []
+
+    context = {
+        'total': total,
+        'quantity': quantity,
+        'cart_items': cart_items
+    }
+    return render(request, 'cart.html', context)
+
+def checkout(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    if request.method=='POST':
+        try: 
+            item_json=request.POST.get('itemsjson','')
+            name=request.POST.get('name','')
+            email=request.POST.get('email','')
+            phone=request.POST.get('phone','')
+            address=request.POST.get('address','')
+            city=request.POST.get('city','')
+            state=request.POST.get('state','')
+            postal_code=request.POST.get('zip_code','')
+            # Extra test
+            items = json.loads(item_json)
+            product_ids = [int(item['product_id']) for item in items]
+            print("Product IDs:", product_ids)
+            products = Product.objects.filter(id__in=product_ids).select_related('owner')
+            owners = []
+            price=0;
+            for product in products:
+                if product.owner:
+                    owners.append({
+                        "username": product.owner.username,
+                    })
+            for product in products:
+                print(product.owner)
+            order=Order(item_json=item_json,name=name,email=email, phone=phone,address=address,city=city,state=state,postal_code=postal_code,product_owner=owners)
+            order.save()
+            update=OrderUpdate(order_id=order.order_id,update_Desc='The order has been placed')
+            update.save()
+            #stripe
+            items = json.loads(item_json)
+            total = sum([float(item['subtotal']) for item in items])
+            total_amount = int(total * 100)  # Stripe expects amount in cents
+
+            # Create Stripe Checkout Session
+            session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[{
+                    'price_data': {
+                        'currency': 'pkr',
+                        'product_data': {
+                            'name': f'Order #{order.order_id}',
+                        },
+                        'unit_amount': total_amount,
+                    },
+                    'quantity': 1,
+                }],
+                mode='payment',
+                success_url=request.build_absolute_uri(f'/checkout/success/?order_id={order.order_id}'),
+                cancel_url=request.build_absolute_uri('/checkout/cancel/'),
+                customer_email=email,
+                metadata={"order_id": str(order.order_id)},
+            )
+
+            return redirect(session.url, code=303)
+
+        except Exception as e:
+            return HttpResponse(f"Error saving order: {e}")
+        return render(request, 'checkout.html', {'success': True,'order_id': order.order_id})
+    return render(request,'checkout.html')
+
+
+def productpage(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    return render(request,'productpage.html')
+def fruit(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    context={
+        'products':Product.objects.all()
+    }
+    return render(request,'fruit.html',context)
+
+
+def vegitable(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    context={
+        'products':Product.objects.all()
+    }
+    return render(request,'vegitable.html',context)
+
+
+def dryfruit(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    context={
+        'products':Product.objects.all()
+    }
+    return render(request,'dryfruit.html',context)
+
+
+def addproduct(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        desc=request.POST.get('desc')
+        price = request.POST.get('price')
+        category = request.POST.get('category')
+        subcategory = request.POST.get('subcategory')
+        image_file = request.FILES.get('imageFile')
+        image_url = request.POST.get('imageURL')
+        stock=request.POST.get('stock')
+        owner=request.user
+
+        if not name or not price or not category or not subcategory:
+            messages.error(request, "All fields except image are required.")
+            return redirect('addproduct')
+
+        try:
+            product = Product(
+                name=name,
+                price=price,
+                category=category,
+                subcategory=subcategory,
+                desc=desc,  
+                data=date.today(),
+                stock=stock,
+                owner=owner
+            )
+
+            if image_file:
+                product.image = image_file
+            elif image_url:
+                img_temp = NamedTemporaryFile(delete=True)
+                with urllib.request.urlopen(image_url) as u:
+                    img_temp.write(u.read())
+                img_temp.flush()
+                file_name = image_url.split("/")[-1]
+                product.image.save(file_name, ContentFile(img_temp.read()))
+
+            product.save()
+            messages.success(request, f"Product '{product.name}' added successfully!")
+        except Exception as e:
+            messages.error(request, f"Failed to add product: {str(e)}")
+
+        return redirect('addproduct')
+    user=request.user
+    products=Product.objects.filter(owner=user)
+    context={
+        'products': products
+    }
+    return render(request, 'addproduct.html',context)
+# delete Product
+def delete_product(request,pk):
+    if request.method == "POST":
+        product = get_object_or_404(Product, pk=pk, owner=request.user)  # Only delete if this user owns it
+        print(product)
+        product.delete()
+    return redirect('addproduct')
+
+def product_cart(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    return render(request,'cart.html')
+
+
+def product_checkout(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    return render(request,'checkout.html')
+
+
+def contact(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    if request.method=='POST':
+        try:
+            name=request.POST.get('name')
+            email=request.POST.get('email')
+            message=request.POST.get('message')
+            contact=Contact.objects.create(name=name,email=email,message=message)
+            contact.save()
+            message.success(request,'information send succefully')
+            
+        except:
+            pass
+    return render(request,'contact.html')
+
+
+
+def pro(request):
+      params={'product':Product.objects.all()}
+      return render(request,'product.html',params)
+
+def productdisplay(request,myid):
+    if request.user.is_anonymous:
+        return redirect('login')
+    product = get_object_or_404(Product, id=myid)
+    related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:4]
+    return render(request, 'productdisplay.html', {
+        'product': product,
+        'related_products': related_products})
+
+def tracker(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id', '')
+        email = request.POST.get('email', '')
+
+        try:
+            # Make sure order_id is an integer
+            order_id = int(order_id)
+
+            # Check if the order exists with matching ID and email
+            order = Order.objects.filter(order_id=order_id, email=email).first()
+            if order:
+                updates = OrderUpdate.objects.filter(order_id=order_id).order_by('timestamp')
+                update_list = []
+
+                for item in updates:
+                    update_list.append({
+                        'text': item.update_Desc,
+                        'time': item.timestamp.strftime("%Y-%m-%d")
+                    })
+
+                return HttpResponse(json.dumps(update_list), content_type="application/json")
+            else:
+                # No matching order found
+                return HttpResponse(json.dumps([]), content_type="application/json")
+
+        except Exception as e:
+            return HttpResponse(json.dumps([]), content_type="application/json")
+
+    return render(request, 'tracker.html')
+
+
+# search Functionalty
+def search(request):
+    
+    keyword = request.GET.get('keyword', '').strip()
+    products = []
+    product_count=0
+    if 'keyword' in request.GET:
+        keyword=request.GET['keyword']
+        if keyword:
+            products=Product.objects.order_by('data').filter(Q(desc__icontains=keyword) | Q(name__icontains=keyword) | Q(category__icontains=keyword) |Q(subcategory=keyword))
+            print(products)
+            product_count=products.count()
+    context={
+        'products':products,
+        'searched': bool(keyword),
+        'product_count': product_count,
+        }
+    return render(request,'search.html',context)
+
+
+def checkout_success(request):
+    order_id = request.GET.get('order_id')
+    # Optionally update your order as paid here
+    return render(request, 'checkout.html', {'success': True, 'order_id': order_id})
+
+def checkout_cancel(request):
+    return HttpResponse("Payment canceled.")
+
+# Formers
+def former(request):
+    activeproduct=Product.objects.filter(owner=request.user).count()
+    full_name=(str(request.user.first_name)).upper()
+    name="".join([part[0].upper() for part in full_name.split()])
+    all_orders = Order.objects.filter(Q(product_owner__icontains=request.user.username)).count()
+    # getting Price
+    order_totals = {}
+    revenue = Decimal('0')
+    pending_count = 0
+    order_statuses = {}
+    orders = Order.objects.filter(product_owner__icontains=request.user.username)
+    for order in orders:
+        total_price_for_user = Decimal('0')
+        try:
+            items = json.loads(order.item_json) 
+        except json.JSONDecodeError:
+            pass
+        for item in items:
+            try:
+                product_id = int(item.get('product_id', 0))
+            except (ValueError, TypeError):
+                continue
+            if Product.objects.filter(id=product_id, owner=request.user).exists():
+                price = Decimal(str(item.get('price', 0)))
+                qty = Decimal(str(item.get('quantity', 0)))
+                total_price_for_user += price * qty
+                order_status=OrderUpdate.objects.filter(order_id=product_id)
+                
+                updates = OrderUpdate.objects.filter(order_id=order.order_id)  
+                for update in updates:
+                    order_statuses[order.order_id] = update.order_status
+                    if update.order_status == 'pending':
+                        pending_count += 1
+        order_totals[order.order_id]=total_price_for_user
+        revenue+=total_price_for_user
+        print( order_statuses)
+    user_products=Product.objects.filter(owner=request.user)
+    # orders
+    order=Order.objects.filter(Q(product_owner__icontains=request.user.username))
+    context={
+        'activeproducts': activeproduct,
+        'full_name' : full_name,
+        'name' : name,
+        'all_orders' : all_orders,
+       # 'total_price' : total_price_for_user,
+        'user_products' : user_products,
+        'orders' : order,
+        'revenue' : revenue,
+        'order_totals': order_totals,
+        'pending_count' : pending_count,
+        'order_statuses' : order_statuses,
+    }
+    if request.method=="POST":
+        message=request.POST.get('message-text')
+        name=request.user
+        email=request.user.email
+        if message.strip(): 
+            try:
+                Contact.objects.create(name=name,email=email,message=message)
+                messages.success(request, "✅ Your message was sent successfully!")
+            except:
+                messages.error(request, "❌ Please enter a message before sending.")
+    return render(request,'farmer.html',context)
+
+# order for farmer
+def farmer_orders(request):
+    order_totals = {}
+    revenue = Decimal('0')
+    order_statuses = {}
+    orders = Order.objects.filter(product_owner__icontains=request.user.username)
+    for order in orders:
+        total_price_for_user = Decimal('0')
+        try:
+            items = json.loads(order.item_json)  # Parse items list
+        except json.JSONDecodeError:
+            pass
+        for item in items:
+            try:
+                product_id = int(item.get('product_id', 0))
+            except (ValueError, TypeError):
+                continue
+            if Product.objects.filter(id=product_id, owner=request.user).exists():
+                price = Decimal(str(item.get('price', 0)))
+                qty = Decimal(str(item.get('quantity', 0)))
+                total_price_for_user += price * qty
+                updates = OrderUpdate.objects.filter(order_id=order.order_id)  
+                for update in updates:
+                    order_statuses[order.order_id] = update.order_status
+        order_totals[order.order_id]=total_price_for_user
+        revenue+=total_price_for_user
+       
+    all_orders = Order.objects.filter(Q(product_owner__icontains=request.user.username)).count()
+    context={
+    'orders':orders,
+    'order_totals':order_totals,
+    'all_orders' : all_orders,
+    'order_statuses' : order_statuses
+    }
+    return render(request,'farmer_orders.html',context)
+
+def update_order_status(request, order_id):
+    if request.method == "POST":
+        new_status = request.POST.get('order_status')
+        order_update = get_object_or_404(OrderUpdate, order_id=order_id)
+        order_update.order_status = new_status
+        order_update.save()
+    return redirect('farmer')
+
+
+
+
+
+
+

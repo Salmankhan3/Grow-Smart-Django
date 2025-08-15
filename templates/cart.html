@@ -1,0 +1,313 @@
+{%load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrowSmart.com</title>
+    <link rel="stylesheet" href="{% static 'style.css'%}">
+    
+    <script src="https://kit.fontawesome.com/a18ae6822d.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <a id="top-section" ></a>
+    <header>
+        <div class="navbar">
+            <div class="nav-logo">
+        <a href="index.html">
+            <div class="logo border"></div>
+            </a>
+      </div>
+         <form name='search' class='search' action="{% url 'search'%}" method='GET'>
+         <div class="search-bar">
+            <select class="search-select">
+                <option>All</option>
+                <option value="fruit">Fruits</option>
+                <option value="Vigitables">Vigitables</option>
+                <option value="seeds">Seeds</option>
+                <option value="Dryfruit">Dryfruit</option>
+            </select>
+            <input placeholder="Search" class="search-input" name='keyword'>
+            <div class="search-icon">
+            <button type="submit" class="search-btn" style="width: 35px; height: 35px; background-color:  rgb(240, 240, 67);  border: none; font-size:20px">
+             <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+           </div>
+
+        </div>
+    </form>
+        <div class="sell_product">
+     <a href='addproduct'> Sell</a>
+    </div>
+        <div class='tracker'>
+        <a href='tracker'>Tracker</a>  
+        </div>
+        <div class="login">
+        <a href="login" target="_blank">Login</a>
+        </div>
+        <div class="regester">
+        <a href="regester" target="_blank">Regester</a>
+        </div>
+        <div class="cart">
+        <div class="icon"><i class="fa-solid fa-cart-shopping"></i> 
+        <a href="cart" class="active">  Cart </a>
+        </div>
+        </div>
+        </div>
+    </header>
+    
+   <div id="chatbot-container">
+  <div id="chatbot-text">Hi! i am Kitti how can i help you </div>
+  <div id="chatbot-icon">
+    <i class="fa-brands fa-rocketchat"></i>
+  </div>
+</div>
+<div id="chatbot-window">
+  <iframe   src="https://warm-feet-send.loca.lt/" frameborder="0" allow="microphone;" title="Chatbot"></iframe>
+</div>
+ <div class="hero-section">
+    <div class="image"><img src="{% static 'images/Fresh-Food_7a9e8440-2c83-4b51-820c-72fa7aa49498.webp' %}" id="m1"></div>
+ 
+    </div>
+<section id="cart-section">
+    <table width="100%" id="table1">
+        <thead>
+            <tr>
+                <td>REMOVE</td>
+                <td>IMAGE</td>
+                <td>PRODUCT</td>
+                <td>PRICE</td>
+                <td>QUANTITIY</td>
+                <td>SUBTOTAL</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cart_item in cart_items %}
+           
+            <tr>
+                 <td>
+            <form method="POST" action="{% url 'remove_cart' %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" class='product_id' value="{{ cart_item.product.id }}">
+                <button type="submit" style="background:none;border:none;">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
+            </form>
+        </td>
+                
+                <td><img src="{{cart_item.product.image.url}}"></td>
+                <input type="hidden" name="product_id" class='product_id' value="{{ cart_item.product.id }}">
+                <td>{{cart_item.product.name}}</td>
+                <td class="price">{{cart_item.product.price}}</td>
+                <td>
+    <input type="number" 
+           value="{{ cart_item.quantity }}" 
+           class="quantity" style="width: 60px; height:30px; padding: 5px; border: 2px solid #ccc; border-radius: 4px; text-align: center;"></td>
+               <td class="subtotal" style="text-align: left; padding-left: 85px;"> {{ cart_item.subtotal }}</td>
+            </tr> 
+
+            {% endfor %}
+        </tbody>
+    </table>
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="alert alert-{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+</section>   
+<section id="cart-add">
+    <div id="coupon">
+        <h3>Apply coupan</h3>
+        <div>
+        <input type="text" placeholder="Enter Your coupon" class="coupon-text">
+        <button class="coupon-btn">Apply</button>
+        </div>
+    </div>
+    <div id="sub-total">
+        <h3>Cart total</h3>
+        <table id="table2">
+            <tr>
+                <td>Cart sub Total</td>
+                <td id="total">Rs. 450</td>
+            </tr>
+            <tr>
+                <td>Shipping</td>
+                <td>Free</td>
+            </tr>
+            <tr>
+                <td><strong>Total</strong></td>
+                <td id="finalprice"><strong>Rs. 1500</strong></td>
+            </tr>
+        </table>
+        <div>
+            <button id="check-out-btn" >Proceed to checkout</button>
+        </div>
+    </div>
+</section>
+<footer>
+    <div class="navfooterbacktotoptext">
+        <a href="#top-section"><p>Back to top</p></a> 
+    </div>
+    <div class="foot-panel2">
+      <ul>
+        <p>Contact Details</p>
+        <a> <i class="fa-solid fa-location-dot"></i> Ring road peshawar</a>
+        <a>
+       <a><i class="fa-solid fa-phone">(092)3189398866</i> </a>
+        <a>Customer Support: 7 Days a Week, 9:00am - 10:00pm </a>
+        <div class="social-media">
+  <a href="https:\\www.facebook.com" class="fa-facebook social-m"><i class="fa-brands fa-facebook"></i></a>
+  <a href="https:\\www.instagram.com"class="instagram social-m"><i class="fa-brands fa-instagram"></i></a>
+  <a href="https:\\www.youtube.com"  class="youtube social-m"><i class="fa-brands fa-youtube"></i></a>
+  <a href="https:\\www.tiktok.com"   class="tiktok social-m"><i class="fa-brands fa-tiktok"></i>
+        </a>
+        </div>
+      </ul>
+<ul>	
+<p>Customer Services</p>
+<a href="index.html" class="contact">
+  Contact Us
+  <span class="hover-text">Contact Us</span>
+</a>
+<a>FAQs</a>
+</ul>
+<ul>
+<p>Information</p>
+<a>Return & Refund</a>
+<a>Privacy Policy</a>
+<a>Terms & Conditions</a>
+</ul>
+<ul>
+<p>Subscribe our Newsletter</p>
+<a>Get the latest offers and promotions!</a>
+<div class="Newsletter">
+<input placeholder="Enter your Email" class="email">
+<div class="Subscribe">Subscibe</div>
+</div>
+</ul>
+</div>
+<div class="foot-panel3">
+<a href="index.html" class="logo2"></a>
+</div>
+<div class="foot-panel4">
+ <div class="pages">
+<a> Conditions of Use</a>
+<a>Privacy Notice</a>
+<a>Consumer Health Data Privacy Disclosure</a>
+<a>Your Ads Privacy Choices</a>
+ </div>
+ <div class="copyright"> 
+  © 2024-2025,Grow smart.com, Inc. All Right reserved
+ </div>
+</div>
+</footer>
+<script>
+    // cart.js
+document.addEventListener("DOMContentLoaded", () => {
+  updateTotal();
+
+  const table = document.querySelector("#table1");
+
+  const observer = new MutationObserver(() => {
+    updateTotal();
+  });
+
+  observer.observe(table, {
+    childList: true,
+    subtree: true,
+  });
+
+  // Handle quantity changes
+  document.querySelectorAll(".quantity").forEach((input, index) => {
+    input.addEventListener("change", () => {
+      let value = Number(input.value);
+      if (value <= 0) {
+        alert("Quantity can't be zero or negative.");
+        input.value = 1;
+        value = 1;
+      }
+
+      const priceText = document.querySelectorAll(".price")[index].innerText.trim();
+      const price = Number(priceText.replace(/[^\d.]/g, ""));
+      const subtotal = price * value;
+      document.querySelectorAll(".subtotal")[index].innerText = subtotal;
+      updateTotal();
+    });
+  });
+
+  // Remove item from UI 
+  document.querySelectorAll(".cancel-item").forEach((icon) => {
+    icon.addEventListener("click", function () {
+      this.closest("tr").remove();
+      updateTotal();
+    });
+  });
+
+  // Coupon logic
+  document.querySelector(".coupon-btn").addEventListener("click", () => {
+    const couponText = document.querySelector(".coupon-text").value.trim();
+    const validCoupon = "123";
+    const totalText = document.querySelector("#total").innerText;
+    let total = parseFloat(totalText.replace(/[^\d.]/g, ""));
+
+    if (couponText === validCoupon) {
+      if (total > 1100) {
+        total -= 1000;
+        document.querySelector("#total").innerText = `Rs ${total}`;
+        document.querySelector("#finalprice").innerText = `Rs ${total}`;
+        alert("Coupon applied successfully!");
+         // Mark coupon as used
+        localStorage.setItem('discountedTotal', total); // <- save for checkout page
+        localStorage.setItem('couponApplied', 'true');
+      } else {
+        alert("Cart total must be greater than Rs 1100 to apply this coupon.");
+      }
+    } else {
+      alert("Invalid coupon code.");
+    }
+  });
+
+  // Total calculation from current DOM
+  function updateTotal() {
+    let total = 0;
+    document.querySelectorAll(".subtotal").forEach((sub) => {
+      total += Number(sub.innerText);
+    });
+    document.querySelector("#total").innerText = `Rs ${total}`;
+    document.querySelector("#finalprice").innerText = `Rs ${total}`;
+  }
+});
+//data for checkout
+document.getElementById("check-out-btn").addEventListener("click", () => {
+  const rows = document.querySelectorAll("#table1 tbody tr");
+  const updatedCart = [];
+  let total = 0;
+  rows.forEach(row => {
+    const priceText = row.querySelector(".price").innerText.replace(/[^0-9.-]+/g, "");
+    const quantity = Number(row.querySelector(".quantity").value);
+    const price = Number(priceText);
+    const subtotal = price * quantity;
+    const product_id=row.querySelector(".product_id").value
+    updatedCart.push({
+      name: row.children[3].innerText,
+      price,
+      quantity,
+      subtotal,
+      image: row.querySelector("img").src,
+      product_id
+    });
+    total += subtotal;
+  });
+  // Save updated cart
+  localStorage.setItem("cartItems", JSON.stringify(updatedCart));
+  localStorage.setItem("Total", total);
+  // Redirect to checkout
+  window.location.href = "checkout.html";
+});
+
+
+</script>
+</body>
+</html>
