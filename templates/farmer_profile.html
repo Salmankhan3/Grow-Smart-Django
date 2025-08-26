@@ -1,0 +1,96 @@
+ <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2e7d32;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: #2e7d32;
+            outline: none;
+            box-shadow: 0 0 6px rgba(46, 125, 50, 0.4);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #6a7eb6;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #25b62f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Enter Land Details</h2>
+        <form method="POST" action="{% url 'create_profile' %}">
+            {% csrf_token %}
+            <label>Land Size:</label>
+            <input type="text" name="land_size" required>
+
+            <label>Soil Type:</label>
+            <input type="text" name="soil_type" required>
+
+            <label>Water Source:</label>
+            <select name="water_source">
+                <option value="tube_well">Tube Well</option>
+                <option value="canal">Canal</option>
+                <option value="rain">Rain</option>
+            </select>
+
+            <label>Temperature:</label>
+            <input type="text" name="temperature" required>
+
+            <label>Soil Moisture:</label>
+            <input type="text" name="soil_moisture" required>
+
+            <button type="submit">Save Profile</button>
+        </form>
+    </div>
+</body>
+</html>

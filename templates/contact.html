@@ -40,7 +40,8 @@
   </div>
 
   <script>
-    document.getElementById("contactForm").addEventListener("submit", function (e) {
+  localStorage.setItem("name",'salman')
+  document.getElementById("contactForm").addEventListener("submit", function (e) {
   e.preventDefault();
 
   const nameInput = document.getElementById("name");

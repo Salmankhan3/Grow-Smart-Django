@@ -433,7 +433,88 @@
                 padding: 16px;
             }
         }
-       
+       {% comment %} Current crops {% endcomment %}
+       .currentcrops {
+  margin: 30px auto;
+  max-width: 1000px;
+  padding: 10px;
+  font-family: Arial, sans-serif;
+}
+
+.crop-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.crop-name {
+  font-weight: bold;
+  color: #2e7d32;
+  min-width: 150px;
+}
+
+.crop-stage {
+  min-width: 120px;
+}
+
+.crop-advice {
+  flex: 1;
+  margin: 0 15px;
+  color: #555;
+  font-size: 14px;
+}
+
+.crop-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crop-actions form.inline-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.crop-actions input {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #2e7d32;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-size: 14px;
+  margin-top:10px
+}
+
+button:hover {
+  background: #1b5e20;
+  transform:translateY(-3px)
+}
+
+.ai-btn {
+  background: #0288d1;
+}
+
+.ai-btn:hover {
+  background: #3d327aff;
+  transform:translateY(-3px)
+}
+
     </style>
 </head>
 <body>
@@ -450,7 +531,10 @@
         {% endfor %}
     </div>
 {% endif %}
+
+  
     <div class="container">
+        
         <!-- Header -->
         <div class="header">
             <h1>Farmer Dashboard</h1>
@@ -459,7 +543,6 @@
                 <div class="user-avatar"> {{name}}</div>
             </div>
         </div>
-
         <!-- Stats Row -->
         <div class="stats-row">
             <div class="stat-card">
@@ -570,7 +653,131 @@
             </div>
         </div>
     </div>
+   <div class="currentcrops">
+  <h2>Current Crops</h2>
+  <div id="cropList">
+    {% for crop in crops %}
+    <div class="crop-row">
+        <a href="{% url 'delete_crop' crop.id %}" 
+   class="text-red-600" style='text-decoration:none;color:inherit;'>
+    ✖️ 
+    </a>
+      <div class="crop-name" style='margin-left:7px;'>{{ crop.crop_name|default:"(Not selected yet)" }}</div>
+      <div class="crop-stage">Stage: {{ crop.stage_label }}</div>
+      <div id="advice-{{ crop.id }}" class="mt-4 p-4 bg-gray-50 rounded-xl" class=crop_advice>
+  <p class="text-gray-700 line-clamp-3">{{ crop.last_ai_advice|truncatewords:30 }}</p>
+  {% if crop.last_ai_advice %}
+    <a href="{% url 'crop_advice' crop.id %}" 
+       class="text-green-600 font-medium hover:underline">
+       📖 Read Full Advice
+    </a>
+  {% endif %}
+</div>
+
+      <div class="crop-actions">
+        {% if crop.current_stage == 1 %}
+          <form method="post" action="{% url 'select_crop' crop.id %}" class="inline-form">
+            {% csrf_token %}
+            <input type="text" name="chosen_crop" placeholder="Enter chosen crop">
+            <button type="submit">Select Crop</button>
+          </form>
+          <button onclick="askAI({{ crop.id }})" class="ai-btn">Get Crop Suggestions</button>
+        {% else %}
+          <form method="post" action="{% url 'advance_stage' crop.id %}" class="inline-form">
+            {% csrf_token %}
+            <button type="submit">Next Stage</button>
+          </form>
+          <button onclick="askAI({{ crop.id }})" class="ai-btn">Get Advice</button>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% comment %} Add new crop {% endcomment %}
+  <h3>Add New Crop</h3>
+  <form method="POST" action="{% url 'add_crop' %}">
+    {% csrf_token %}
+    <button type="submit">Add Crop</button>
+    <pre id="out"></pre>
+  </form>
+</div>
+
+
+
+  
+
+
+
+
+<!-- send data to rag -->
+<pre id="out"></pre>
+
+
+ <!-- end of send data to rag -->
     <script>
+      {% comment %} send and recieve data from Rag {% endcomment %}
+
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+document.getElementById('askForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const question = document.getElementById('q').value;
+  const csrftoken = getCookie('csrftoken');
+
+  try {
+    const res = await fetch("{% url 'ask_rag' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({ question: question })   // <--- IMPORTANT
+    });
+
+    if (!res.ok) {
+      throw new Error("Server error: " + res.status);
+    }
+
+    const data = await res.json();
+    document.getElementById('out').textContent =
+      data.ok ? data.answer : ('Error: ' + (data.error || 'Unknown'));
+  } catch (err) {
+    console.error(err);
+    document.getElementById('out').textContent = "Request failed: " + err.message;
+  }
+});
+
+
+
+      {% comment %} end of send and recieve data from Rag{% endcomment %}
+
+    {% comment %} crops List {% endcomment %}
+ async function askAI(cropId) {
+  const csrftoken = document.cookie.match(/csrftoken=([^;]+)/)[1];
+  const res = await fetch(`/ask-rag/${cropId}/`, {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": csrftoken,
+      "Content-Type": "application/json"
+    }
+  });
+  const data = await res.json();
+  document.getElementById("out").textContent = data.ok ? data.answer : ("Error: " + data.error);
+}
+    {% comment %} end crop list {% endcomment %}
     setTimeout(function() {
         let alertBox = document.getElementById('alert-box');
         if (alertBox) {

@@ -52,6 +52,18 @@
           <div class="login">
         <a href="contact" target="_blank">Contact Us</a>
         </div>
+        <!-- Notifications -->
+         <a  id="notifications" class="nav-link dropdown-toggle" href="{% url 'exporter_notifications' %}"  role="button" data-bs-toggle="dropdown" 
+         onmouseover="this.style.background='linear-gradient(90deg, #ffecd9, #fcb99f)'; this.style.color='#100';"
+         onmouseout="this.style.background='linear-gradient(90deg, #f9f9f9, #e9ecef)'; this.style.color='#333';"
+>
+    🔔 
+    {% if unread_count > 0 %}
+      <span class="badge bg-danger">{{ unread_count }}</span>
+    {% endif %}
+  </a>
+
+        <!-- End notification -->
         <div class="cart">
         <div class="icon"><i class="fa-solid fa-cart-shopping"></i> 
         <a href="cart" target="_blank">  Cart </a>

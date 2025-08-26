@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>exporter_notifications.html</title>
+</head>
+<body>
+    <h2>Notifications</h2>
+    {% if notifications %}
+<ul>
+  {% for n in notifications %}
+    <li style="margin:10px 0; padding:10px; border:1px solid #ddd; border-radius:5px;">
+      {{ n.message }} - <small>{{ n.created_at }}</small>
+      {% if not n.is_read %}<strong>NEW</strong>{% endif %}
+    </li>
+  {% endfor %}
+</ul>
+{% else %}
+  <p>No notifications yet.</p>
+{% endif %}
+
+</body>
+</html>

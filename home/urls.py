@@ -41,7 +41,15 @@ urlpatterns = [
     path('checkout/order_history.html',views.order_history,name='checkout/order_history'),
     path('checkout/index.html',views.index,name='checkout/index.html'),
     path('checkout/success/order_history',views.order_history,name='order_history'),
-    path('checkout/success/index',views.index,name='index'),
-    path('crop-tracker',views.crop_tracker,name='crop-tracker')
- 
+    path('checkout/success/index',views.index,name='checkout/success/index'),
+    path("notifications/", views.exporter_notifications, name="exporter_notifications"),
+    path("ask-rag/", views.ask_rag, name="ask_rag"),
+    path('add_crop',views.add_crop,name='add_crop'),
+    path("ask-rag/<int:crop_id>/", views.ask_rag, name="ask_rag"),
+    path('select_crop/<int:crop_id>/',views.select_crop,name='select_crop'),
+    path('advance_stage/<int:crop_id>/',views.advance_stage,name='advance_stage'),
+    path("create_profile/", views.create_profile, name="create_profile"),
+    path("crop/<int:crop_id>/advice/", views.crop_advice, name="crop_advice"),
+    path("crop/<int:crop_id>/download/", views.download_advice_pdf, name="download_advice_pdf"),
+    path("crop/<int:crop_id>/delete/", views.delete_crop, name="delete_crop"),
 ]

@@ -1,0 +1,39 @@
+{% load static %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-8 p-6 bg-white shadow-lg rounded-2xl">
+    <!-- Crop Header -->
+    <div class="mb-6 border-b pb-4">
+        <h1 class="text-2xl font-bold text-green-700">
+            RAG Farming Advice for {{ crop.crop_name|default:"Selected Crop" }}
+        </h1>
+        <p class="text-sm text-gray-500">
+            Stage: <span class="font-medium">{{ crop.get_current_stage_display }}</span> |
+            Last updated: {{ crop.updated_at|date:"M d, Y H:i" }}
+        </p>
+    </div>
+
+    <!-- Full Advice -->
+    <div class="prose max-w-none text-gray-800 leading-relaxed">
+        {% if crop.last_ai_advice %}
+            <p style="white-space: pre-line;">{{ crop.last_ai_advice }}</p>
+        {% else %}
+            <p class="text-gray-500 italic">No AI advice generated yet for this crop.</p>
+        {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-8 flex gap-4">
+        <a href="{% url 'farmer' %}" 
+           class="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300">
+           Back to Dashboard
+        </a><br><br>
+        {% if crop.last_ai_advice %}
+        <a href="{% url 'download_advice_pdf' crop.id %}" 
+           class="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700">
+            Download as PDF
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

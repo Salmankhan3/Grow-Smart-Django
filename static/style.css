@@ -873,3 +873,29 @@ ul p{
 .catagory-fruit,.catagory-vigitable,.catagory-dryfruit{
     margin-top: 100px;
 }
+
+/* Notifications */
+#notifications{
+    position: relative;
+    display: inline-block;
+    font-weight: 600;
+    color: #333;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #f9f9f9, #e9ecef);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+.bg-danger{
+    position: absolute;
+    top: 1px;
+    right: -2px;
+    background: #ff4757;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}

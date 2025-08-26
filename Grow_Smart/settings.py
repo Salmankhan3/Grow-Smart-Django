@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ['growsmart.com','127.0.0.1']
 
 INSTALLED_APPS = [
     'home.apps.HomeConfig',
+    'streaming.apps.StreamingConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -129,5 +130,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+
+
+
+
+
 STRIPE_SECRET_KEY='sk_test_51RqBipHNWpaSrYNup7nUSN0SPcJxT8RuqJNbnKATC9nXoHllUre02yGIQz7POJILSxIBDr7rKCfuWnAb4TzpQcGf00zpbuUJjm'
 STRIPE_Publishable_KEY='pk_test_51RqBipHNWpaSrYNusSa7WTEsFNFsNOiBlF8kIluAHpw4jR77IUAVVSbTiz6okVyosriI4BcjbGQo920KKiCe3hCb00t23XXEF9'
+
+import os
+
+KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "host.docker.internal:9092")
+KAFKA_TOPIC_PRODUCTS = os.getenv("KAFKA_TOPIC_PRODUCTS", "products")
+
+RAG_API_URL="https://1b17b913cbc6.ngrok-free.app/rag"
+RAG_API_KEY="salman"

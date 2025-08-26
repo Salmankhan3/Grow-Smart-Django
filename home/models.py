@@ -115,7 +115,7 @@ class UserProfile(models.Model):
     userType=models.CharField(max_length=50,null=True,blank=True)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username} - {self.userType}"
 
 
 # FARMER RATING
@@ -145,66 +145,53 @@ class FarmerRating(models.Model):
 
 
 
+class Notification(models.Model):
+    exporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f"Notification for {self.exporter.username}: {self.message[:30]}"
 
 #################### crops tracker ####################
-# Farmer model
-class Farmer(models.Model):
-    name = models.CharField(max_length=100)
-    contact = models.CharField(max_length=50, blank=True, null=True)
-    location = models.CharField(max_length=100, blank=True, null=True)
+class FarmerProfile(models.Model):
+    farmer = models.OneToOneField(User, on_delete=models.CASCADE)
+    land_size = models.CharField(max_length=50,null=True)
+    soil_type = models.CharField(max_length=50)
+    water_source = models.CharField(
+        max_length=20,
+        choices=[("tube_well", "Tube well"), ("canal", "Canal"), ("rain", "Rain")],
+        default="tube_well"
+    )
+    temperature = models.CharField(max_length=50)
+    soil_moisture = models.CharField(max_length=50)
 
     def __str__(self):
-        return self.name
-
-
-# Crop model
-class Crop(models.Model):
-    STATUS_CHOICES = [
-        ('Planning', 'Planning'),
-        ('Sowing', 'Sowing'),
-        ('Cultivation', 'Cultivation'),
-        ('Harvest', 'Harvest'),
-        ('Post-Harvest', 'Post-Harvest'),
+        return f"{self.farmer.username}'s Profile"
+class CropPlan(models.Model):
+    STAGES = [
+        (1, "Crop Selection"),
+        (2, "Soil Preparation"),
+        (3, "Seed Growing"),
+        (4, "Irrigation & Fertilisation"),
+        (5, "Pest & Disease Control"),
+        (6, "Harvesting"),
+        (7, "Post-Harvesting"),
     ]
 
-    farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE, related_name="crops")
-    crop_name = models.CharField(max_length=50)
-    variety = models.CharField(max_length=50, blank=True, null=True)
-    season = models.CharField(max_length=50, blank=True, null=True)
-    start_date = models.DateField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Planning")
+    farmer = models.ForeignKey(User, on_delete=models.CASCADE)
+    profile = models.ForeignKey(FarmerProfile, on_delete=models.CASCADE, null=True, blank=True)
 
-    def __str__(self):
-        return f"{self.crop_name} ({self.farmer.name})"
+    crop_name = models.CharField(max_length=100, blank=True, null=True)
+    current_stage = models.IntegerField(choices=STAGES, default=1)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    last_ai_advice = models.TextField(blank=True, null=True)
 
+    def stage_label(self):
+        return dict(self.STAGES).get(self.current_stage, "Unknown")
 
-# Crop Stage model
-class CropStage(models.Model):
-    STAGE_CHOICES = [
-        ('Planning', 'Planning'),
-        ('Sowing', 'Sowing'),
-        ('Cultivation', 'Cultivation'),
-        ('Harvest', 'Harvest'),
-        ('Post-Harvest', 'Post-Harvest'),
-    ]
-
-    crop = models.ForeignKey(Crop, on_delete=models.CASCADE, related_name="stages")
-    stage = models.CharField(max_length=20, choices=STAGE_CHOICES)
-    start_date = models.DateField(blank=True, null=True)
-    end_date = models.DateField(blank=True, null=True)
-    notes = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.crop.crop_name} - {self.stage}"
-
-
-# Crop Activity model (for detailed logs under each stage)
-class CropActivity(models.Model):
-    stage = models.ForeignKey(CropStage, on_delete=models.CASCADE, related_name="activities")
-    activity_name = models.CharField(max_length=100)
-    activity_date = models.DateField()
-    details = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.activity_name} ({self.stage.stage})"
+    def next_stage(self):
+        if self.current_stage < 7:
+            self.current_stage += 1
+            self.save()

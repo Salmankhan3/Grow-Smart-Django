@@ -9,7 +9,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from home.models import Product
 from home.models import Order
-from home.models import OrderUpdate,Cart,CartItem,Contact,UserProfile,OrderItem,FarmerRating
+from home.models import OrderUpdate,Cart,CartItem,Contact,UserProfile
+from home.models import OrderItem,FarmerRating,Notification,CropPlan,FarmerProfile
 from django.db.models import Q
 from django.conf import settings
 import stripe
@@ -29,8 +30,21 @@ def index(request):
         avg_rating=Avg('owner__ratings_received__rating'),
         total_reviews=Count('owner__ratings_received')
     )
+    unread_count = 0
+    recent_notifications = []
+
+    if request.user.is_authenticated:
+        unread_count = Notification.objects.filter(
+            exporter=request.user, is_read=False
+        ).count()
+        recent_notifications = Notification.objects.filter(
+            exporter=request.user
+        ).order_by('-created_at')[:5]
+
     context={
         'products':products,
+        "unread_count": unread_count,
+        "recent_notifications": recent_notifications,
     }
     return render(request,'index.html',context)
 
@@ -67,7 +81,9 @@ def loginuser(request):
                 profile = UserProfile.objects.get(user=user)
                 print("User type: ",profile.userType)
                 if profile.userType == 'farmer':
-                    return redirect('farmer')  
+                   if not FarmerProfile.objects.filter(farmer=request.user).exists():
+                        return redirect('create_profile')
+                   return redirect('farmer')  
                 elif profile.userType == 'exporter':
                     return redirect('index')  
                 else:
@@ -509,6 +525,8 @@ def former(request):
     user_products=Product.objects.filter(owner=request.user)
     # orders
     order=Order.objects.filter(Q(product_owner__icontains=request.user.username))
+    # crops
+    crops = CropPlan.objects.filter(farmer=request.user)
     context={
         'activeproducts': activeproduct,
         'full_name' : full_name,
@@ -521,6 +539,7 @@ def former(request):
         'order_totals': order_totals,
         'pending_count' : pending_count,
         'order_statuses' : order_statuses,
+        "crops": crops,
     }
     if request.method=="POST":
         message=request.POST.get('message-text')
@@ -610,48 +629,164 @@ def order_history(request):
     print(orders)
     return render(request, 'order_history.html', {'orders': orders})
 
+
+
+def exporter_notifications(request):
+    notifications = Notification.objects.filter(exporter=request.user).order_by('-created_at')
+    print(notifications)
+    notifications.update(is_read=True)
+    return render(request, "exporter_notifications.html", {"notifications": notifications})
+
+#################### Sending Data to colab ####################
+from django.http import JsonResponse, HttpResponseBadRequest
+from django.views.decorators.http import require_POST
+from .rag_client import query_rag, RAGError
+
+@require_POST
+def ask_rag(request):
+    try:
+        raw = request.body.decode("utf-8")
+        print("RAW BODY:", raw)   # <--- debug
+        body = json.loads(raw)
+    except Exception as e:
+        print("JSON parse error:", e)
+        return HttpResponseBadRequest("Invalid JSON")
+
+    question = body.get("question")
+    if not question:
+        return HttpResponseBadRequest("Missing 'question'")
+
+    try:
+        result = query_rag(question)   # calls Colab API
+        return JsonResponse(result)
+    except RAGError as e:
+        return JsonResponse({"ok": False, "error": str(e)}, status=502)
+
+
 #################### crops tracker ####################
-def crop_tracker(request):
-    return render(request,'crop-tracker.html')
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
-from .models import Farmer, Crop, CropStage, CropActivity
-from .forms import FarmerForm, CropForm, CropStageForm, CropActivityForm
+def create_profile(request):
+    if request.method=='POST':
+        FarmerProfile.objects.update_or_create(
+          farmer=request.user,
+          defaults={
+            "land_size": request.POST.get("land_size"),
+            "soil_type": request.POST.get("soil_type"),
+            "water_source": request.POST.get("water_source"),
+            "temperature": request.POST.get("temperature"),
+            "soil_moisture": request.POST.get("soil_moisture"),
+        }
+    )
+        return redirect("farmer")
+    return render(request, "farmer_profile.html")
+@require_POST
+def add_crop(request):
+    profile = get_object_or_404(FarmerProfile, farmer=request.user)
 
-# List all crops for a farmer
-def farmer_crops(request, farmer_id):
-    farmer = get_object_or_404(Farmer, pk=farmer_id)
-    crops = farmer.crops.all()
-    return render(request, "farmer_crops.html", {"farmer": farmer, "crops": crops})
+    CropPlan.objects.create(
+        farmer=request.user,
+        profile=profile,
+        crop_name=request.POST.get("crop_name"), 
+    )
+    return redirect("farmer")
 
+@require_POST
+def ask_rag(request, crop_id):
+    try:
+        crop = get_object_or_404(CropPlan, id=crop_id, farmer=request.user)
+        farmerprofile=get_object_or_404(FarmerProfile,farmer=request.user)
+        farmer_data = {
+            "stage": int(crop.current_stage),
+            "crop_name": crop.crop_name,   # will be None/blank at stage 1
+            'last_ai_advice':crop.last_ai_advice,
+            "land_size": farmerprofile.land_size,
+            "soil_type": farmerprofile.soil_type,
+            "water_source": farmerprofile.water_source,
+            "temperature": farmerprofile.temperature,
+            "soil_moisture": farmerprofile.soil_moisture,
+        }
 
-# Add a new crop for a farmer
-def add_crop(request, farmer_id):
-    farmer = get_object_or_404(Farmer, pk=farmer_id)
-    if request.method == "POST":
-        form = CropForm(request.POST)
-        if form.is_valid():
-            crop = form.save(commit=False)
-            crop.farmer = farmer
-            crop.save()
-            return redirect("farmer_crops", farmer_id=farmer.id)
-    else:
-        form = CropForm()
-    return render(request, "add_crop.html", {"form": form, "farmer": farmer})
+        print("➡️ Sending payload to Colab:", farmer_data)
+        result = query_rag(**farmer_data)
+        print("✅ Colab response:", result)
 
-
-# Update crop stage (move to next stage)
-def update_crop_stage(request, crop_id):
-    crop = get_object_or_404(Crop, pk=crop_id)
-    stages = ["Planning", "Sowing", "Cultivation", "Harvest", "Post-Harvest"]
-    current_index = stages.index(crop.status)
-    if current_index < len(stages) - 1:
-        crop.status = stages[current_index + 1]
+        # Save AI advice
+        crop.last_ai_advice = result.get("answer")
         crop.save()
-    return redirect("farmer_crops", farmer_id=crop.farmer.id)
+
+        # Only auto-advance if stage > 1
+        if result.get("ok") and crop.current_stage > 1 and crop.current_stage < 7:
+            crop.next_stage()
+
+        return JsonResponse(result)
+
+    except RAGError as e:
+        print("❌ RAGError:", e)
+        return JsonResponse({"ok": False, "error": str(e)}, status=502)
+    except Exception as e:
+        import traceback
+        print("❌ Unexpected error:", e)
+        print(traceback.format_exc())
+        return JsonResponse({"ok": False, "error": "Server crash, check logs"}, status=500)
 
 
+@require_POST
+def select_crop(request, crop_id):
+    crop = get_object_or_404(CropPlan, id=crop_id, farmer=request.user)
+    chosen_crop = request.POST.get("chosen_crop")
+    if chosen_crop:
+        crop.crop_name = chosen_crop
+        crop.current_stage = 2   # move to next stage
+        crop.save()
+        return JsonResponse({"ok": True, "crop_name": chosen_crop, "stage": crop.current_stage})
+    else:
+        return JsonResponse({"ok": False, "error": "No crop selected"}, status=400)
+@require_POST
+def advance_stage(request, crop_id):
+    crop = get_object_or_404(CropPlan, id=crop_id, farmer=request.user)
+    if crop.current_stage < 7:
+        crop.current_stage += 1
+        crop.save()
+    return redirect('farmer')
+
+def crop_advice(request, crop_id):
+    crop = get_object_or_404(CropPlan, id=crop_id, farmer=request.user)
+    return render(request, "crop_advice.html", {"crop": crop})
+
+#### download response as pdf ############
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+def download_advice_pdf(request, crop_id):
+    crop = get_object_or_404(CropPlan, id=crop_id, farmer=request.user)
+
+    response = HttpResponse(content_type="application/pdf")
+    response['Content-Disposition'] = f'attachment; filename="{crop.crop_name}_advice.pdf"'
+
+    p = canvas.Canvas(response, pagesize=letter)
+    p.setFont("Helvetica", 12)
+    p.drawString(100, 750, f"AI Farming Advice for {crop.crop_name}")
+    p.drawString(100, 730, f"Stage: {crop.get_current_stage_display()}")
+
+    text = p.beginText(100, 700)
+    text.setFont("Helvetica", 11)
+    advice = crop.last_ai_advice or "No advice available."
+    for line in advice.splitlines():
+        text.textLine(line)
+    p.drawText(text)
+
+    p.showPage()
+    p.save()
+    return response
+
+def delete_crop(request, crop_id):
+    crop = get_object_or_404(CropPlan, id=crop_id, farmer=request.user)
+    
+    if request.method == "POST":
+        crop.delete()
+        messages.success(request, "Crop plan deleted successfully ✅")
+        return redirect("farmer")  
+
+    return render(request, "confirm_delete_crop.html", {"crop": crop})
 
 
 
