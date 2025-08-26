@@ -1,0 +1,139 @@
+{% block content %}
+<div class="rating-container">
+  <h2>Rate {{ order_item.farmer.username }}</h2>
+  <p>Product: <span>{{ order_item.product.name }}</span></p>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Star Rating -->
+    <label>Your Rating:</label>
+    <div class="star-rating">
+      <input type="radio" name="rating" id="rating-5" value="5" required>
+      <label for="rating-5">★</label>
+      <input type="radio" name="rating" id="rating-4" value="4">
+      <label for="rating-4">★</label>
+      <input type="radio" name="rating" id="rating-3" value="3">
+      <label for="rating-3">★</label>
+      <input type="radio" name="rating" id="rating-2" value="2">
+      <label for="rating-2">★</label>
+      <input type="radio" name="rating" id="rating-1" value="1">
+      <label for="rating-1">★</label>
+    </div>
+
+    <!-- Review -->
+    <label for="review">Review (optional):</label>
+    <textarea name="review" id="review" rows="4"></textarea>
+
+    <!-- Submit -->
+    <button type="submit">Submit Rating</button>
+  </form>
+</div>
+
+<style>
+/* Container styling */
+.rating-container {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  font-family: Arial, sans-serif;
+}
+
+.rating-container h2 {
+  margin-bottom: 0.5rem;
+  font-size: 1.6rem;
+  color: #333;
+}
+
+.rating-container p {
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+.rating-container p span {
+  font-weight: bold;
+}
+
+/* Star Rating */
+.star-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.star-rating input {
+  display: none;
+}
+
+.star-rating label {
+  font-size: 2rem;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.star-rating input:checked ~ label {
+  color: gold;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+  color: gold;
+}
+
+/* Form elements */
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #444;
+  font-weight: 500;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: vertical;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+/* Submit button */
+button {
+  background: #4CAF50;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #43a047;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+  .rating-container {
+    padding: 1rem;
+  }
+
+  .star-rating label {
+    font-size: 1.5rem;
+  }
+}
+</style>
+{% endblock %}

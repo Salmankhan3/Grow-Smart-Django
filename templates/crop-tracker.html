@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GrowSmart - Crop Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f7f9fc;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    .form-container, .crops-list {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #27ae60;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+    button:hover {
+      background: #219150;
+    }
+    .crop-card {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: #fafafa;
+    }
+    .status {
+      font-weight: bold;
+      color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🌱 GrowSmart - Crop Lifecycle Tracker</h2>
+
+  <!-- Add Crop Form -->
+  <div class="form-container">
+    <h3>Add New Crop</h3>
+    <form id="cropForm">
+      <input type="text" id="cropName" placeholder="Crop Name (e.g., Beans)" required>
+      <input type="text" id="variety" placeholder="Variety (e.g., Local White)">
+      <input type="text" id="season" placeholder="Season (e.g., Kharif 2025)">
+      <input type="date" id="startDate" required>
+      <button type="submit">Add Crop</button>
+    </form>
+  </div>
+
+  <!-- Active Crops -->
+  <div class="crops-list">
+    <h3>My Crops</h3>
+    <div id="cropList"></div>
+  </div>
+
+  <script>
+    const cropForm = document.getElementById('cropForm');
+    const cropList = document.getElementById('cropList');
+
+    let crops = [];
+
+    cropForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const crop = {
+        id: Date.now(),
+        name: document.getElementById('cropName').value,
+        variety: document.getElementById('variety').value,
+        season: document.getElementById('season').value,
+        startDate: document.getElementById('startDate').value,
+        status: "Planning"
+      };
+
+      crops.push(crop);
+      renderCrops();
+
+      cropForm.reset();
+    });
+
+    function updateStatus(id) {
+      const stages = ["Planning","Sowing","Cultivation","Harvest","Post-Harvest"];
+      const crop = crops.find(c => c.id === id);
+      let currentIndex = stages.indexOf(crop.status);
+      if (currentIndex < stages.length - 1) {
+        crop.status = stages[currentIndex + 1];
+      }
+      renderCrops();
+    }
+
+    function renderCrops() {
+      cropList.innerHTML = "";
+      crops.forEach(crop => {
+        let card = document.createElement('div');
+        card.className = "crop-card";
+        card.innerHTML = `
+          <h4>${crop.name} (${crop.variety || "Unknown Variety"})</h4>
+          <p>Season: ${crop.season}</p>
+          <p>Start Date: ${crop.startDate}</p>
+          <p class="status">Current Stage: ${crop.status}</p>
+          <button onclick="updateStatus(${crop.id})">Mark Next Stage</button>
+        `;
+        cropList.appendChild(card);
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -9,13 +9,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from home.models import Product
 from home.models import Order
-from home.models import OrderUpdate,Cart,CartItem,Contact,UserProfile
+from home.models import OrderUpdate,Cart,CartItem,Contact,UserProfile,OrderItem,FarmerRating
 from django.db.models import Q
 from django.conf import settings
 import stripe
 from django.views.decorators.csrf import csrf_exempt
 import re
 from decimal import Decimal
+from django.db.models import Avg, Count
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -24,8 +25,12 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 def index(request):
     if request.user.is_anonymous:
         return redirect('login')
+    products = Product.objects.select_related('owner').annotate(
+        avg_rating=Avg('owner__ratings_received__rating'),
+        total_reviews=Count('owner__ratings_received')
+    )
     context={
-        'products':Product.objects.all()
+        'products':products,
     }
     return render(request,'index.html',context)
 
@@ -184,6 +189,7 @@ def checkout(request):
         return redirect('login')
     if request.method=='POST':
         try: 
+            payment_method=request.POST.get('payment_method')
             item_json=request.POST.get('itemsjson','')
             name=request.POST.get('name','')
             email=request.POST.get('email','')
@@ -206,17 +212,31 @@ def checkout(request):
                     })
             for product in products:
                 print(product.owner)
-            order=Order(item_json=item_json,name=name,email=email, phone=phone,address=address,city=city,state=state,postal_code=postal_code,product_owner=owners)
+            # order
+            order=Order(item_json=item_json,name=name,email=email, phone=phone,address=address,city=city,state=state,postal_code=postal_code,product_owner=owners,buyer=request.user)
             order.save()
+            #orederItem
+            items = json.loads(item_json)
+            for item in items:
+                product = Product.objects.get(id=item['product_id'])
+                OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    farmer=product.owner,
+                    quantity=item.get('quantity', 1),
+                    subtotal=item.get('subtotal', 0)
+                )
+            #orderUpdate
             update=OrderUpdate(order_id=order.order_id,update_Desc='The order has been placed')
             update.save()
             #stripe
             items = json.loads(item_json)
-            total = sum([float(item['subtotal']) for item in items])
-            total_amount = int(total * 100)  # Stripe expects amount in cents
-
+            if payment_method=='stripe':
+                print(payment_method)
+                total = sum([float(item['subtotal']) for item in items])
+                total_amount = int(total * 100)  
             # Create Stripe Checkout Session
-            session = stripe.checkout.Session.create(
+                session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
                 line_items=[{
                     'price_data': {
@@ -234,14 +254,21 @@ def checkout(request):
                 customer_email=email,
                 metadata={"order_id": str(order.order_id)},
             )
-
-            return redirect(session.url, code=303)
+                return redirect(session.url, code=303)
+            return redirect(f'/checkout/success/?order_id={order.order_id}'
+            )
 
         except Exception as e:
             return HttpResponse(f"Error saving order: {e}")
         return render(request, 'checkout.html', {'success': True,'order_id': order.order_id})
     return render(request,'checkout.html')
 
+def checkout_success(request):
+    order_id = request.GET.get('order_id')
+    return render(request, 'checkout.html', {'success': True, 'order_id': order_id})
+
+def checkout_cancel(request):
+    return HttpResponse("Payment canceled.")
 
 def productpage(request):
     if request.user.is_anonymous:
@@ -372,10 +399,21 @@ def productdisplay(request,myid):
     if request.user.is_anonymous:
         return redirect('login')
     product = get_object_or_404(Product, id=myid)
-    related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:4]
+    farmer = product.owner 
+    # Aggregate farmer ratings
+    farmer_rating = FarmerRating.objects.filter(farmer=farmer).aggregate(
+        avg_rating=Avg("rating"),
+        total_reviews=Count("id")
+    )
+    # Fetch all reviews for this farmer
+    farmer_reviews = FarmerRating.objects.filter(farmer=farmer).select_related("buyer").order_by("-id")
+
+    related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:20]
     return render(request, 'productdisplay.html', {
         'product': product,
-        'related_products': related_products})
+        'related_products': related_products,
+        "farmer_rating": farmer_rating,
+        "farmer_reviews": farmer_reviews})
 
 def tracker(request):
     if request.user.is_anonymous:
@@ -430,14 +468,6 @@ def search(request):
         }
     return render(request,'search.html',context)
 
-
-def checkout_success(request):
-    order_id = request.GET.get('order_id')
-    # Optionally update your order as paid here
-    return render(request, 'checkout.html', {'success': True, 'order_id': order_id})
-
-def checkout_cancel(request):
-    return HttpResponse("Payment canceled.")
 
 # Formers
 def former(request):
@@ -547,6 +577,79 @@ def update_order_status(request, order_id):
         order_update.order_status = new_status
         order_update.save()
     return redirect('farmer')
+
+
+def rate_farmer(request, order_item_id):
+    order_item = get_object_or_404(OrderItem, pk=order_item_id, order__buyer=request.user)
+
+    if request.method == 'POST':
+        rating_value = int(request.POST.get('rating'))
+        review_text = request.POST.get('review', '')
+
+        FarmerRating.objects.update_or_create(
+            buyer=request.user,
+            order_item=order_item,
+            defaults={
+                'farmer': order_item.farmer,
+                'rating': rating_value,
+                'review': review_text
+            }
+        )
+        messages.success(request, "Thank you for your feedback!")
+        return redirect('order_history')
+
+    return render(request, 'rate-farmer.html', {'order_item': order_item})
+
+def order_history(request):
+    orders = (
+        Order.objects
+        .filter(buyer=request.user)  
+        .prefetch_related('items__farmer', 'items__product', 'items__rating')
+        .order_by('created_at')
+    )
+    print(orders)
+    return render(request, 'order_history.html', {'orders': orders})
+
+#################### crops tracker ####################
+def crop_tracker(request):
+    return render(request,'crop-tracker.html')
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse
+from .models import Farmer, Crop, CropStage, CropActivity
+from .forms import FarmerForm, CropForm, CropStageForm, CropActivityForm
+
+# List all crops for a farmer
+def farmer_crops(request, farmer_id):
+    farmer = get_object_or_404(Farmer, pk=farmer_id)
+    crops = farmer.crops.all()
+    return render(request, "farmer_crops.html", {"farmer": farmer, "crops": crops})
+
+
+# Add a new crop for a farmer
+def add_crop(request, farmer_id):
+    farmer = get_object_or_404(Farmer, pk=farmer_id)
+    if request.method == "POST":
+        form = CropForm(request.POST)
+        if form.is_valid():
+            crop = form.save(commit=False)
+            crop.farmer = farmer
+            crop.save()
+            return redirect("farmer_crops", farmer_id=farmer.id)
+    else:
+        form = CropForm()
+    return render(request, "add_crop.html", {"form": form, "farmer": farmer})
+
+
+# Update crop stage (move to next stage)
+def update_crop_stage(request, crop_id):
+    crop = get_object_or_404(Crop, pk=crop_id)
+    stages = ["Planning", "Sowing", "Cultivation", "Harvest", "Post-Harvest"]
+    current_index = stages.index(crop.status)
+    if current_index < len(stages) - 1:
+        crop.status = stages[current_index + 1]
+        crop.save()
+    return redirect("farmer_crops", farmer_id=crop.farmer.id)
 
 
 

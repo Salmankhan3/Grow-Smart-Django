@@ -24,7 +24,7 @@
       flex-wrap: wrap;
     }
 
-    .billing-details, .order-summary {
+    .billing-details, .order-summary{
       background: #fff;
       padding: 20px;
       border-radius: 12px;
@@ -32,7 +32,6 @@
       flex: 1;
       min-width: 300px;
     }
-
     .billing-details input, .billing-details select {
       width: 98%;
       padding: 10px;
@@ -54,7 +53,7 @@
       font-weight: bold;
     }
 
-    .btn {
+    .btn,.btn2 {
       display: inline-block;
       padding: 12px 20px;
       background: #28a745;
@@ -62,12 +61,39 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      margin-top: 15px;
+      margin-top: 30px;
     }
-
-    .btn:hover {
+    .btn:hover,.btn2:hover {
       background: #218838;
+      transform: translateY(-4px);
+      transition: transform 0.3s ease, background 0.3s ease;
+      }
+    .order_history{
+      width: 450px;
+      height: 400px;
+      background-color: #e7e4e4;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-left: 450px;
     }
+.order_history_btn,.continue_shoping_btn{
+      display: inline-block;
+      padding: 12px 20px;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 28px;
+      margin-left:30px;
+}
+.order_history_btn:hover,.continue_shoping_btn:hover{
+  background: #218838;
+  transform: translateY(-4px);
+  transition: transform 0.3s ease, background 0.3s ease;
+}
   </style>
 </head>
   {% if success %}
@@ -108,40 +134,37 @@
   <table id="checkout-table">
      <tbody></tbody>
   </table>
-  <button type='submit' class="btn" id="place-order-btn">Place Order</button>
+  <button type='submit' name='payment_method' value="stripe" class="btn place-order-btn">Proceed to checkout </button>
+  <button type='submit' name='payment_method' value="COD" class="btn2 place-order-btn">Cash on delevery </button>
 </div>
 </form>
+<div class="order_history"></div>
 <script>
-  document.getElementById("place-order-btn").addEventListener("click", () => {
-  const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-  if (cartItems.length === 0) {
-    alert("Your cart is empty. Please add items before checking out.");
-    window.location.href = "cart.html"; // replace with your cart page
-    return;
-}
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const address = document.getElementById("address").value.trim();
+  document.querySelectorAll(".place-order-btn").forEach(button => {
+    button.addEventListener("click", () => {
+      const paymentMethod = this.value;
+      const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      if (cartItems.length === 0) {
+        alert("Your cart is empty. Please add items before checking out.");
+        window.location.href = "cart.html";
+        return;
+      }
 
-    if (!name || !email || !phone || !address) {
-      alert("Please fill in all required billing details.");
-      return;
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const address = document.getElementById("address").value.trim();
+
+      if (!name || !email || !phone || !address) {
+        alert("Please fill in all required billing details.");
+        return;
+      }
+
+      document.getElementById("itemsjson").value = JSON.stringify(cartItems);
+      if (paymentMethod === "cod") {
+      return; // allow normal form submission
     }
-  // alert("Order placed successfully!\nThank you for shopping with us.");
-  // document.getElementById("name").value = "";
-  // document.getElementById("email").value = "";
-  // document.getElementById("phone").value = "";
-  // document.getElementById("address").value = "";
-  // document.getElementById("city").value = "";
-  // document.getElementById("zip").value = "";
-  //Clear cart from localStorage
-  // localStorage.removeItem("cartItems");
-  // localStorage.removeItem("Total");
-  // localStorage.removeItem("discountedTotal");
-  // //Clear the checkout table
-  // document.querySelector("#checkout-table tbody").innerHTML = "";
-  document.getElementById("itemsjson").value = JSON.stringify(cartItems);
+    });
   });
   document.addEventListener("DOMContentLoaded", () => {
   const checkoutTableBody = document.querySelector("#checkout-table tbody");
@@ -219,8 +242,27 @@ window.addEventListener("beforeunload", function (e) {
     // Clear form fields
     document.getElementById("checkout-form").reset();
 
+
     // Clear the checkout table
     document.querySelector("#checkout-table tbody").innerHTML = "";
+  
+    // reomve order-summerydiv and
+    document.querySelector('.order-summary').remove()
+    document.querySelector('.billing-details').remove()
+
+    // add order_history btn and continue_shoping_btn
+    const order_history_btn=document.createElement('button')
+    const continue_shoping_btn=document.createElement('button')
+    order_history_btn.setAttribute("class","order_history_btn")
+    order_history_btn.setAttribute("onclick", 'window.location.href="order_history"');
+    order_history_btn.setAttribute('type','button')
+    order_history_btn.innerText='View-Order-History'
+    document.querySelector(".order_history").appendChild(order_history_btn)  
+    continue_shoping_btn.setAttribute("class","continue_shoping_btn")
+    continue_shoping_btn.setAttribute("onclick",'window.location.href="index"')
+    continue_shoping_btn.setAttribute('type','button')
+    continue_shoping_btn.innerText='Continue Shoping'
+    document.querySelector(".order_history").appendChild(continue_shoping_btn)   
   }
 </script>
 

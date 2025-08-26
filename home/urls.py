@@ -36,5 +36,12 @@ urlpatterns = [
     path('farmer',views.former,name='farmer'),
     path('farmer_orders',views.farmer_orders,name='farmer_orders'),
     path('update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
-    
+    path('order_history',views.order_history,name='order_history'),
+    path('rate-farmer/<int:order_item_id>/', views.rate_farmer, name='rate-farmer'),
+    path('checkout/order_history.html',views.order_history,name='checkout/order_history'),
+    path('checkout/index.html',views.index,name='checkout/index.html'),
+    path('checkout/success/order_history',views.order_history,name='order_history'),
+    path('checkout/success/index',views.index,name='index'),
+    path('crop-tracker',views.crop_tracker,name='crop-tracker')
+ 
 ]

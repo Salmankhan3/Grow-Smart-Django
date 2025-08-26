@@ -15,10 +15,12 @@
     }
 
     #related-products h2 {
-      font-size: 28px;
+      font-size: 40px;
+      margin-top: 40px;
       margin-bottom: 30px;
-      color: #222;
+      color: #289c4f;
       text-align: center;
+      font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
     }
 
     .product-container {
@@ -61,6 +63,111 @@
       font-weight: bold;
       color: #008000;
     }
+    .rating {
+  width: 220px;
+  min-height: 150px;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin: 20px 0 0 50px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 15px;
+
+}
+
+.rating:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+}
+
+.rating-score p {
+  font-size: 28px;
+  font-weight: bold;
+  color: #f97316; /* orange highlight */
+  margin: 0;
+}
+
+.rating-score .stars {
+  font-size: 20px;
+  margin: 8px 0;
+  color: #facc15; /* yellow stars */
+  letter-spacing: 2px;
+}
+
+.rating-score .reviews {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.no-rating {
+  font-size: 16px;
+  color: #6b7280;
+}
+.review-heading {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 20px 0 15px;
+  color: #374151;
+}
+
+.reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.review-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 15px 18px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.review-user {
+  font-weight: 600;
+  color: #111827;
+}
+
+.review-rating {
+  font-size: 14px;
+  background: #fef3c7;
+  color: #b45309;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.review-text {
+  font-size: 15px;
+  color: #4b5563;
+  line-height: 1.5;
+  margin: 0;
+  font-style: italic;
+}
+
+.no-reviews {
+  color: #6b7280;
+  font-style: italic;
+} 
   </style>
 </head>
 <body>
@@ -88,7 +195,6 @@
       </div>
     </div>
     <div class="single-pro-detail">
-      <p>home > product</p>
       <h4 id="product-name">{{ product.name }}</h4>
       <h2 id="product-price">Rs. {{ product.price }}</h2>
       <hr>
@@ -112,10 +218,13 @@
         <li class="delevery" style="display: flex; align-items: center; gap: 5px;margin-bottom: 8px;">
             <p>Delever Area:</p><p style="font-weight: 500;" 500;>Peshawar only</p>
         </li>
-        <li class="delever by" style="display: flex; align-items: center; gap: 5px;margin-bottom: 50px;">
+        <li class="delever by" style="display: flex; align-items: center; gap: 5px;margin-bottom: 20px;">
             <p>Delever By:</p><p style="font-weight: 500;" 500;>Grow-Smart.com</p>
         </li>
-        </ul>
+        <li class="sold by" style="display: flex; align-items: center; gap: 5px;margin-bottom: 20px;">
+          <p>Sold by: {{ product.owner.username }}</p>
+        </li>
+        </ul>            
       <form action="{% url 'add_carts' product.id %}" method="POST">
   {% csrf_token %}
   <input type="number" name="quantity" value="1"  class="item_count" style='margin-left:-10px'>
@@ -124,6 +233,35 @@
 
     </div>
   </section>
+<div class="rating">
+  {% if farmer_rating.avg_rating %}
+    <div class="rating-score">
+      <p>{{ farmer_rating.avg_rating|floatformat:1 }}/5</p>
+      <div class="stars">⭐⭐⭐⭐⭐</div>
+      <span class="reviews">({{ farmer_rating.total_reviews }} reviews)</span>
+    </div>
+  {% else %}
+    <p class="no-rating">No ratings yet for this farmer</p>
+  {% endif %}
+</div>
+<h3 class="review-heading">What Customer says:</h3>
+
+{% if farmer_reviews %}
+  <div class="reviews">
+    {% for review in farmer_reviews %}
+      <div class="review-card">
+        <div class="review-header">
+          <strong class="review-user">{{ review.buyer.username }}</strong>
+          <span class="review-rating">⭐ {{ review.rating }}</span>
+        </div>
+        <p class="review-text">“{{ review.review }}”</p>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="no-reviews">No reviews yet.</p>
+{% endif %}
+
 <section id="related-products">
   <h2>Related Products</h2>
   <div class="product-container">

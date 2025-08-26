@@ -1,0 +1,112 @@
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order History</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #d8dde2;
+  }
+
+  h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .order-card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    padding: 16px;
+    margin-bottom: 20px;
+    border-left: 5px solid #28a745;
+    transition: transform 0.2s ease;
+    width:60%;
+  }
+
+  .order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+  }
+
+  .order-card h4 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    color: #28a745;
+  }
+
+  .order-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .order-card li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .order-card li:last-child {
+    border-bottom: none;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 10px 15px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+    background: #007bff;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+  }
+
+  .btn:hover {
+    background: #0056b3;
+  }
+
+  .rating-stars {
+    color: #ffc107;
+    font-weight: bold;
+  }
+
+  .empty-msg {
+    text-align: center;
+    padding: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    color: #666;
+  }
+</style>
+</head>
+<body>
+<h2>Your Orders</h2>
+{% for order in orders %}
+  <div class="order-card">
+    <h4>Order #{{ order.order_id }} — {{ order.created_at|date:"F j, Y, g:i a" }}</h4>
+    <ul>
+      {% for item in order.items.all %}
+        <li>
+          <strong>{{ item.product.name }}</strong> <br><br>Sold by: {{ item.farmer.username }}<br><br>
+          Quantity: {{ item.quantity }} <br><br> Subtotal: Rs {{ item.subtotal }}<br><br>
+          {% if item.rating %}
+            ⭐ {{ item.rating.rating }}<br><br>"{{item.rating.review }}"
+          {% else %}
+            <a href="{% url 'rate-farmer' item.id %}" class="btn btn-sm btn-primary">Rate Farmer</a>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+{% empty %}
+  <p>You have no orders yet.</p>
+{% endfor %}
+
+{% endblock %}
+</body>
+</html>

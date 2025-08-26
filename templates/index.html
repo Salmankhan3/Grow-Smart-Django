@@ -44,7 +44,7 @@
         <a href="product" target="_blank">Shop</a>
         </div>
         <div class="login">
-        <a href="login" target="_blank">Login / Regester</a>
+        <a href="login" target="_blank">Login / Register</a>
         </div>
         {% comment %} <div class="regester">
         <a href="regester" target="_blank">Regester</a>
@@ -64,15 +64,7 @@
     <div id="text"><a>You are on Grow Smart.com enjoy your Shoping</a></div>
     </div>
   </div>
-   <div id="chatbot-container">
-  <div id="chatbot-text">Hi! i am Kitti how can i help you </div>
-  <div id="chatbot-icon">
-    <i class="fa-brands fa-rocketchat"></i>
-  </div>
-</div>
-<div id="chatbot-window">
-  <iframe   src="https://dull-papayas-find.loca.lt/" frameborder="0" allow="microphone;" title="Chatbot"></iframe>
-</div>
+  
 <div class="catagory-text">
  <p id="category">Shop By Category</p>
  </div>
@@ -441,6 +433,15 @@
       <div class="box-img" style="background-image: url('{{ product.image.url }}');"></div>
       <p class="product-name">{{ product.name }}</p>
       <p id="price">Rs. {{ product.price }}</p>
+      
+      <!-- Farmer Rating -->
+         {% if product.avg_rating %}
+         <p class="rating">⭐ {{ product.avg_rating|floatformat:1 }}/5 
+         <small>({{ product.total_reviews }} reviews)</small>
+         </p>
+         {% else %}
+        <p class="rating"><small>No ratings yet</small></p>
+        {% endif %}
        <form  action="{% url 'add_carts' product.id %}" method="POST">
         {% csrf_token %}
         <input type="hidden" name="quantity" value="1">

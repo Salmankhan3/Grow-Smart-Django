@@ -3,7 +3,8 @@ from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-
+from django.conf import settings
+import json
 
 
 
@@ -58,8 +59,32 @@ class Order(models.Model):
     state=models.CharField(max_length=150)
     postal_code=models.CharField(max_length=150)
     product_owner=models.TextField(max_length=500,null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True,null=True,blank=True)
+    buyer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='orders',
+        null=True, blank=True
+    )
     def __str__(self):
         return f"Order #{self.order_id} - {self.name}"
+
+
+
+
+#orderitem
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    farmer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="farmer_orders"
+    )
+    quantity = models.PositiveIntegerField()
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+
+
 class OrderUpdate(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -91,11 +116,95 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
-# @receiver(post_save, sender=User)
-# def creat_user_profile(sender,instance,created,**kwargs):
-#     if created:
-#         UserProfile.objects.create(user=instance)
-#     else:
-#         instance.profile.save()
 
-    
+
+# FARMER RATING
+class FarmerRating(models.Model):
+    farmer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="ratings_received"
+    )
+    buyer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="ratings_given"
+    )
+    order_item = models.OneToOneField(
+        OrderItem,
+        on_delete=models.CASCADE,
+        related_name="rating"
+    )
+    rating = models.PositiveSmallIntegerField()  # 1–5
+    review = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('buyer', 'order_item')
+
+
+
+
+
+
+#################### crops tracker ####################
+# Farmer model
+class Farmer(models.Model):
+    name = models.CharField(max_length=100)
+    contact = models.CharField(max_length=50, blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+# Crop model
+class Crop(models.Model):
+    STATUS_CHOICES = [
+        ('Planning', 'Planning'),
+        ('Sowing', 'Sowing'),
+        ('Cultivation', 'Cultivation'),
+        ('Harvest', 'Harvest'),
+        ('Post-Harvest', 'Post-Harvest'),
+    ]
+
+    farmer = models.ForeignKey(Farmer, on_delete=models.CASCADE, related_name="crops")
+    crop_name = models.CharField(max_length=50)
+    variety = models.CharField(max_length=50, blank=True, null=True)
+    season = models.CharField(max_length=50, blank=True, null=True)
+    start_date = models.DateField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Planning")
+
+    def __str__(self):
+        return f"{self.crop_name} ({self.farmer.name})"
+
+
+# Crop Stage model
+class CropStage(models.Model):
+    STAGE_CHOICES = [
+        ('Planning', 'Planning'),
+        ('Sowing', 'Sowing'),
+        ('Cultivation', 'Cultivation'),
+        ('Harvest', 'Harvest'),
+        ('Post-Harvest', 'Post-Harvest'),
+    ]
+
+    crop = models.ForeignKey(Crop, on_delete=models.CASCADE, related_name="stages")
+    stage = models.CharField(max_length=20, choices=STAGE_CHOICES)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.crop.crop_name} - {self.stage}"
+
+
+# Crop Activity model (for detailed logs under each stage)
+class CropActivity(models.Model):
+    stage = models.ForeignKey(CropStage, on_delete=models.CASCADE, related_name="activities")
+    activity_name = models.CharField(max_length=100)
+    activity_date = models.DateField()
+    details = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.activity_name} ({self.stage.stage})"
