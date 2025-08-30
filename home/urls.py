@@ -52,4 +52,5 @@ urlpatterns = [
     path("crop/<int:crop_id>/advice/", views.crop_advice, name="crop_advice"),
     path("crop/<int:crop_id>/download/", views.download_advice_pdf, name="download_advice_pdf"),
     path("crop/<int:crop_id>/delete/", views.delete_crop, name="delete_crop"),
+    path("crop/<int:crop_id>/outcome/", views.record_outcome, name="record_outcome"),
 ]

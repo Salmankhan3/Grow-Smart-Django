@@ -210,3 +210,23 @@ class CropPlan(models.Model):
         if self.current_stage < 7:
             self.current_stage += 1
             self.save()
+
+class CropOutcome(models.Model):
+    crop = models.OneToOneField("CropPlan", on_delete=models.CASCADE, related_name="outcome")
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("success", "✅ Successfully Harvested"),
+            ("damaged", "❌ Damaged / Failed"),
+        ]
+    )
+    yield_amount = models.FloatField(
+        null=True,
+        blank=True,
+        help_text="Yield in kilograms (or tons)"
+    )
+    notes = models.TextField(blank=True, null=True, help_text="Remarks about outcome")
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.crop.crop_name} → {self.get_status_display()}"

@@ -11,7 +11,7 @@ from django.db import IntegrityError
 from home.models import Product
 from home.models import Order
 from home.models import OrderUpdate,Cart,CartItem,Contact,UserProfile
-from home.models import OrderItem,FarmerRating,Notification,CropPlan,FarmerProfile
+from home.models import OrderItem,FarmerRating,Notification,CropPlan,FarmerProfile,CropOutcome
 from django.db.models import Q
 from django.conf import settings
 import stripe
@@ -22,6 +22,7 @@ from django.db.models import Avg, Count
 from home.weather import get_weather
 import requests
 from home.rag_client import query_rag,RAGError
+from .forms import CropOutcomeForm
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -578,7 +579,13 @@ def former(request):
     #         "crop": crop,
     #         "advice": ai_advice
     #     })
-
+    # Crop outcome
+    outcomes = CropOutcome.objects.filter(crop__farmer=request.user)
+    crop_stats = {
+        "total": outcomes.count(),
+        "success": outcomes.filter(status="success").count(),
+        "damaged": outcomes.filter(status="damaged").count(),
+        }
 
     context={
         'activeproducts': activeproduct,
@@ -595,7 +602,10 @@ def former(request):
         "crops": crops,
         "weather": weather_data,
         # "crop_advices": crop_advices,
+        "crop_stats" :crop_stats
     }
+   
+
     if request.method=="POST":
         message=request.POST.get('message-text')
         name=request.user
@@ -857,6 +867,27 @@ def delete_crop(request, crop_id):
 
     return render(request, "confirm_delete_crop.html", {"crop": crop})
 
+#Crop record 
+def record_outcome(request, crop_id):
+    crop = get_object_or_404(CropPlan, id=crop_id, farmer=request.user)
+
+    # if already exists → edit outcome
+    try:
+        outcome = crop.outcome
+    except CropOutcome.DoesNotExist:
+        outcome = None
+
+    if request.method == "POST":
+        form = CropOutcomeForm(request.POST, instance=outcome)
+        if form.is_valid():
+            outcome = form.save(commit=False)
+            outcome.crop = crop
+            outcome.save()
+            return redirect("farmer")  # go back to farmer dashboard
+    else:
+        form = CropOutcomeForm(instance=outcome)
+
+    return render(request, "record_outcome.html", {"form": form, "crop": crop})
 
 
 

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from home.models import Product
 from home.models import Order,OrderUpdate,Cart,CartItem,Contact,UserProfile
-from home.models import FarmerRating,Notification,FarmerProfile,CropPlan
+from home.models import FarmerRating,Notification,FarmerProfile,CropPlan,CropOutcome
 admin.site.register(Product)
 admin.site.register(Order)
 admin.site.register(OrderUpdate)
@@ -13,3 +13,4 @@ admin.site.register(FarmerRating)
 admin.site.register(Notification)
 admin.site.register(FarmerProfile)
 admin.site.register(CropPlan)
+admin.site.register(CropOutcome)

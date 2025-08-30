@@ -788,7 +788,21 @@ button:hover {
     <a href="{% url 'crop_advice' crop.id %}" 
        class="text-green-600 font-medium hover:underline">
        📖 Read Full Advice
+    </a><br>
+    {% if crop.current_stage == 7 %}
+  {% if crop.outcome %}
+    <p>
+      Outcome: {{ crop.outcome.get_status_display }}
+      {% if crop.outcome.yield_amount %}
+        ({{ crop.outcome.yield_amount }} kg)
+      {% endif %}
+    </p>
+  {% else %}
+    <a href="{% url 'record_outcome' crop.id %}" class="btn btn-success">
+      📊 Record Harvest Outcome
     </a>
+  {% endif %}
+{% endif %}
   {% endif %}
 </div>
 
@@ -832,10 +846,15 @@ button:hover {
     </div>
   {% endfor %}
 {% endif %}
-
-
-
-  
+<div class="stats-card" style="padding:15px; border-radius:10px; background:#e6ffe6; margin-bottom:20px;">
+  <h3>📊 Crop Outcome Summary</h3>
+  <p><strong>Total Completed Crops:</strong> {{ crop_stats.total }}</p>
+  <p><strong>✅ Successful:</strong> {{ crop_stats.success }}</p>
+  <p><strong>❌ Damaged:</strong> {{ crop_stats.damaged }}</p>
+  {% if stats.total > 0 %}
+    <p><strong>🌱 Success Rate:</strong> {{ crop_stats.success|floatformat:2 }}/{{ crop_stats.total }} ({{ crop_stats.success|divisibleby:stats.total|yesno:"100%,calc%" }})</p>
+  {% endif %}
+</div>
 
 
 
