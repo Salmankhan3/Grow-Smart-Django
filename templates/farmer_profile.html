@@ -66,13 +66,29 @@
     </style>
 </head>
 <body>
+      {% if messages %}
+    <div class="alert-messages" id="alert-box">
+        {% for msg in messages %}
+            <div class="alert 
+                {% if msg.tags == 'success' %}alert-success
+                {% elif msg.tags == 'error' %}alert-error
+                {% endif %}
+            ">
+                {{ msg }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
     <div class="container">
         <h2>Enter Land Details</h2>
         <form method="POST" action="{% url 'create_profile' %}">
             {% csrf_token %}
             <label>Land Size:</label>
             <input type="text" name="land_size" required>
-
+            <label>Location:</label>
+            <input type="text" name="location" required>
+            <label>Region/Agroecological_zone:</label>
+            <input type="text" name="region" required>
             <label>Soil Type:</label>
             <input type="text" name="soil_type" required>
 
@@ -83,11 +99,7 @@
                 <option value="rain">Rain</option>
             </select>
 
-            <label>Temperature:</label>
-            <input type="text" name="temperature" required>
-
-            <label>Soil Moisture:</label>
-            <input type="text" name="soil_moisture" required>
+           
 
             <button type="submit">Save Profile</button>
         </form>

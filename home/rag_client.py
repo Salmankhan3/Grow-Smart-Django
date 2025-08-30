@@ -5,7 +5,9 @@ class RAGError(Exception):
     pass
 
 def query_rag(stage, crop_name=None, land_size=None, soil_type=None, 
-              water_source=None, temperature=None, soil_moisture=None,last_ai_advice=None):
+              water_source=None,soil_moisture=None,last_ai_advice=None,Soil_pH=None,location=None,
+              Agroecological_zone=None,
+              humidity=None,pressure=None,wind_speed=None,temperature=None,last_rain=None,next_rain=None):
 
     url = settings.RAG_API_URL
     headers = {"X-API-Key": settings.RAG_API_KEY, "Content-Type": "application/json"}
@@ -15,10 +17,18 @@ def query_rag(stage, crop_name=None, land_size=None, soil_type=None,
         "land_size": land_size,
         "soil_type": soil_type,
         "water_source": water_source,
-        "temperature": temperature,
         "soil_moisture": soil_moisture,
         "stage": int(stage),
-        "last_ai_advice":last_ai_advice
+        "last_ai_advice":last_ai_advice,
+        "Soil_pH" : Soil_pH,
+        "location":location,
+        "Agroecological_zone":Agroecological_zone,
+        "humidity":humidity,
+        "pressure":pressure,
+        "wind_speed":wind_speed,
+        "temperature":str(temperature),
+        "last_rain":last_rain,
+        "next_rain":next_rain
     }
     print("Sending payload:", payload)
     try:

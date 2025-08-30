@@ -1,39 +1,343 @@
 {% load static %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto mt-8 p-6 bg-white shadow-lg rounded-2xl">
-    <!-- Crop Header -->
-    <div class="mb-6 border-b pb-4">
-        <h1 class="text-2xl font-bold text-green-700">
-            RAG Farming Advice for {{ crop.crop_name|default:"Selected Crop" }}
+<style>
+    /* Custom CSS for enhanced styling */
+    .advice-container {
+        background: linear-gradient(135deg, #f8fffe 0%, #f0fff4 50%, #e6fffa 100%);
+        border: 1px solid #d4ede8;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .advice-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #10b981, #059669, #047857);
+        animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { background-position: -200px 0; }
+        100% { background-position: 200px 0; }
+    }
+    
+    .crop-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        margin: -1.5rem -1.5rem 2rem -1.5rem;
+        padding: 2rem 1.5rem 1.5rem 1.5rem;
+        position: relative;
+    }
+    
+    .crop-header::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        right: 0;
+        height: 20px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        clip-path: polygon(0 0, 100% 0, 95% 100%, 5% 100%);
+    }
+    
+    .crop-title {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .crop-meta {
+        opacity: 0.9;
+        font-size: 0.95rem;
+        animation: fadeInUp 0.6s ease-out 0.2s both;
+    }
+    
+    .stage-badge {
+        background: rgba(255,255,255,0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+        display: inline-block;
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+    
+    .advice-content {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border-left: 4px solid #10b981;
+        position: relative;
+        animation: fadeIn 0.8s ease-out 0.4s both;
+        line-height: 1.8;
+    }
+    
+    .advice-content::before {
+        content: '💡';
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background: #10b981;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+    
+    .no-advice {
+        text-align: center;
+        padding: 3rem 2rem;
+        color: #6b7280;
+        background: #f9fafb;
+        border-radius: 1rem;
+        border: 2px dashed #d1d5db;
+        animation: pulse 2s infinite;
+    }
+    
+    .no-advice::before {
+        content: '📝';
+        display: block;
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+        animation: fadeInUp 1s ease-out 0.6s both;
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    
+    .btn:hover::before {
+        left: 100%;
+    }
+    
+    .btn-secondary {
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+    
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: 1px solid #047857;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    
+    .icon {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 0.6; }
+        50% { opacity: 0.8; }
+    }
+    
+    /* Responsive design */
+    @media (max-width: 640px) {
+        .crop-title {
+            font-size: 1.5rem;
+        }
+        
+        .advice-content {
+            padding: 1.5rem;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            justify-content: center;
+        }
+    }
+    
+    /* Smooth scroll behavior */
+    html {
+        scroll-behavior: smooth;
+    }
+</style>
+
+<div class="max-w-4xl mx-auto mt-8 p-6 advice-container shadow-2xl rounded-2xl">
+    <!-- Enhanced Crop Header -->
+    <div class="crop-header">
+        <h1 class="crop-title">
+             RAG Farming Advice for {{ crop.crop_name|default:"Selected Crop" }}
         </h1>
-        <p class="text-sm text-gray-500">
-            Stage: <span class="font-medium">{{ crop.get_current_stage_display }}</span> |
-            Last updated: {{ crop.updated_at|date:"M d, Y H:i" }}
-        </p>
+        <div class="crop-meta">
+            <span class="stage-badge">
+                📊 Stage: {{ crop.get_current_stage_display }}
+            </span>
+            <span class="ml-4">
+                🕒 Last updated: {{ crop.updated_at|date:"M d, Y H:i" }}
+            </span>
+        </div>
     </div>
 
-    <!-- Full Advice -->
-    <div class="prose max-w-none text-gray-800 leading-relaxed">
-        {% if crop.last_ai_advice %}
-            <p style="white-space: pre-line;">{{ crop.last_ai_advice }}</p>
-        {% else %}
-            <p class="text-gray-500 italic">No AI advice generated yet for this crop.</p>
-        {% endif %}
-    </div>
 
-    <!-- Actions -->
-    <div class="mt-8 flex gap-4">
-        <a href="{% url 'farmer' %}" 
-           class="px-4 py-2 bg-gray-200 rounded-lg shadow hover:bg-gray-300">
-           Back to Dashboard
-        </a><br><br>
+    {% if crop.last_ai_advice %}
+        <div class="advice-content">
+            <div class="prose max-w-none text-gray-800" style="white-space: pre-line; font-size: 1.1rem;">
+                {{ crop.last_ai_advice }}
+            </div>
+        </div>
+    {% else %}
+        <div class="no-advice">
+            <div class="text-xl font-semibold mb-2">No AI Advice Available</div>
+            <p>No AI advice has been generated yet for this crop. Please check back later or contact support.</p>
+        </div>
+    {% endif %}
+
+
+    <div class="action-buttons">
+        <a href="{% url 'farmer' %}" class="btn btn-secondary">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Back to Dashboard
+        </a>
+        
         {% if crop.last_ai_advice %}
-        <a href="{% url 'download_advice_pdf' crop.id %}" 
-           class="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700">
-            Download as PDF
+        <a href="{% url 'download_advice_pdf' crop.id %}" class="btn btn-primary">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Download PDF Report
         </a>
         {% endif %}
     </div>
+    {% if crop.last_ai_advice %}
+    <div class="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+        <h3 class="text-sm font-semibold text-gray-600 mb-2">🚀 Quick Actions</h3>
+        <div class="flex flex-wrap gap-2">
+            <button onclick="window.print()" class="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors">
+                🖨️ Print Advice
+            </button>
+            <button onclick="shareAdvice()" class="text-xs px-3 py-1 bg-purple-100 text-purple-700 rounded-full hover:bg-purple-200 transition-colors">
+                📤 Share
+            </button>
+            <button onclick="copyToClipboard()" class="text-xs px-3 py-1 bg-green-100 text-green-700 rounded-full hover:bg-green-200 transition-colors">
+                📋 Copy Text
+            </button>
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+<script>
+    function copyToClipboard() {
+        const adviceText = document.querySelector('.advice-content .prose').innerText;
+        navigator.clipboard.writeText(adviceText).then(() => {
+            // Show success message
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ Copied!';
+            btn.style.background = '#dcfce7';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = '';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+            alert('Failed to copy advice to clipboard');
+        });
+    }
+    
+    function shareAdvice() {
+        if (navigator.share) {
+            const cropName = '{{ crop.crop_name|default:"Selected Crop" }}';
+            navigator.share({
+                title: `RAG Farming Advice for ${cropName}`,
+                text: document.querySelector('.advice-content .prose').innerText,
+                url: window.location.href
+            });
+        } else {
+            // Fallback: copy link to clipboard
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('Advice link copied to clipboard!');
+            });
+        }
+    }
+    
+    // Add smooth loading animation
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('.advice-container').style.opacity = '0';
+        document.querySelector('.advice-container').style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            document.querySelector('.advice-container').style.transition = 'all 0.6s ease-out';
+            document.querySelector('.advice-container').style.opacity = '1';
+            document.querySelector('.advice-container').style.transform = 'translateY(0)';
+        }, 100);
+    });
+</script>
 {% endblock %}

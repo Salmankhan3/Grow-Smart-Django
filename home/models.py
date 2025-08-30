@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
 import json
+from home.geocode import geocode_location
 
 
 
@@ -158,14 +159,25 @@ class Notification(models.Model):
 class FarmerProfile(models.Model):
     farmer = models.OneToOneField(User, on_delete=models.CASCADE)
     land_size = models.CharField(max_length=50,null=True)
+    location=models.CharField(max_length=100,null=True,blank=True)
+    Agroecological_zone=models.CharField(max_length=100,null=True,blank=True)
     soil_type = models.CharField(max_length=50)
     water_source = models.CharField(
         max_length=20,
         choices=[("tube_well", "Tube well"), ("canal", "Canal"), ("rain", "Rain")],
         default="tube_well"
     )
-    temperature = models.CharField(max_length=50)
-    soil_moisture = models.CharField(max_length=50)
+    lat = models.FloatField(null=True, blank=True)
+    lon = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        # Auto-geocode if location is set but lat/lon missing
+        if self.location and (not self.lat or not self.lon):
+            lat, lon = geocode_location(self.location)
+            if lat and lon:
+                self.lat = lat
+                self.lon = lon
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.farmer.username}'s Profile"
@@ -184,9 +196,12 @@ class CropPlan(models.Model):
     profile = models.ForeignKey(FarmerProfile, on_delete=models.CASCADE, null=True, blank=True)
 
     crop_name = models.CharField(max_length=100, blank=True, null=True)
+    crop_variety=models.CharField(max_length=50,blank=True,null=True)
     current_stage = models.IntegerField(choices=STAGES, default=1)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    created_at = models.DateField(auto_now_add=True, blank=True, null=True)
+    harvesting_date=models.DateField(auto_now=False, auto_now_add=False,blank=True,null=True)
     last_ai_advice = models.TextField(blank=True, null=True)
+    crop_field=models.IntegerField(blank=True,null=True)
 
     def stage_label(self):
         return dict(self.STAGES).get(self.current_stage, "Unknown")

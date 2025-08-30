@@ -1,10 +1,11 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseForbidden
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 import json
 from datetime import date
+import datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from home.models import Product
@@ -18,6 +19,9 @@ from django.views.decorators.csrf import csrf_exempt
 import re
 from decimal import Decimal
 from django.db.models import Avg, Count
+from home.weather import get_weather
+import requests
+from home.rag_client import query_rag,RAGError
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -521,12 +525,61 @@ def former(request):
                         pending_count += 1
         order_totals[order.order_id]=total_price_for_user
         revenue+=total_price_for_user
-        print( order_statuses)
+        # print( order_statuses)
     user_products=Product.objects.filter(owner=request.user)
     # orders
     order=Order.objects.filter(Q(product_owner__icontains=request.user.username))
     # crops
     crops = CropPlan.objects.filter(farmer=request.user)
+    
+    # weather data
+    profile = get_object_or_404(FarmerProfile, farmer=request.user)
+    weather_data = None
+    if profile.lat and profile.lon:
+        try:
+            weather_data = get_weather(profile.lat, profile.lon)
+            print("weather data: ",weather_data)
+        except Exception as e:
+            print("⚠️ Weather API error:", e)
+    # crop advice
+    # crop_advices = []
+    # for crop in crops:
+    #     ai_advice = None
+    #     if weather_data:
+    #         try:
+    #             data = query_rag(
+    #                 stage=crop.current_stage,
+    #                 crop_name=crop.crop_name,
+    #                 # come from profile,
+    #                 land_size=profile.land_size,
+    #                 soil_type=profile.soil_type,
+    #                 water_source=profile.water_source,
+    #                 Agroecological_zone=profile.Agroecological_zone,
+    #                 location=profile.location,
+    #                 #  crop-specific
+    #                 soil_moisture='40%',
+    #                 last_ai_advice=crop.last_ai_advice,
+    #                 Soil_pH=2.5,
+    #                 # weather
+    #                 humidity=weather_data.get("humidity"),
+    #                 pressure=weather_data.get("pressure"),
+    #                 wind_speed=weather_data.get("wind_speed"),
+    #                 temperature=weather_data.get("temperature"),
+    #                 last_rain=weather_data.get("last_rain"),
+    #                 next_rain=weather_data.get("next_rain"),
+    #             )
+    #             ai_advice = data.get("answer")
+    #             crop.last_ai_advice = ai_advice
+    #             crop.save()
+    #         except RAGError as e:
+    #             ai_advice = f"⚠️ Error fetching AI advice: {e}"
+
+    #     crop_advices.append({
+    #         "crop": crop,
+    #         "advice": ai_advice
+    #     })
+
+
     context={
         'activeproducts': activeproduct,
         'full_name' : full_name,
@@ -540,6 +593,8 @@ def former(request):
         'pending_count' : pending_count,
         'order_statuses' : order_statuses,
         "crops": crops,
+        "weather": weather_data,
+        # "crop_advices": crop_advices,
     }
     if request.method=="POST":
         message=request.POST.get('message-text')
@@ -551,6 +606,9 @@ def former(request):
                 messages.success(request, "✅ Your message was sent successfully!")
             except:
                 messages.error(request, "❌ Please enter a message before sending.")
+    userprofile=UserProfile.objects.get(user=request.user)
+    if userprofile.userType !='farmer':
+         return HttpResponseForbidden("🚫 You don’t have permission to access this page.")
     return render(request,'farmer.html',context)
 
 # order for farmer
@@ -642,27 +700,6 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.http import require_POST
 from .rag_client import query_rag, RAGError
 
-@require_POST
-def ask_rag(request):
-    try:
-        raw = request.body.decode("utf-8")
-        print("RAW BODY:", raw)   # <--- debug
-        body = json.loads(raw)
-    except Exception as e:
-        print("JSON parse error:", e)
-        return HttpResponseBadRequest("Invalid JSON")
-
-    question = body.get("question")
-    if not question:
-        return HttpResponseBadRequest("Missing 'question'")
-
-    try:
-        result = query_rag(question)   # calls Colab API
-        return JsonResponse(result)
-    except RAGError as e:
-        return JsonResponse({"ok": False, "error": str(e)}, status=502)
-
-
 #################### crops tracker ####################
 
 def create_profile(request):
@@ -673,16 +710,19 @@ def create_profile(request):
             "land_size": request.POST.get("land_size"),
             "soil_type": request.POST.get("soil_type"),
             "water_source": request.POST.get("water_source"),
-            "temperature": request.POST.get("temperature"),
-            "soil_moisture": request.POST.get("soil_moisture"),
+            # "temperature":34,    # temperature will come from iot devices
+            # "soil_moisture":'80%',  # soil mosture will come from iot devices 
+            'location':request.POST.get('location'),
+            'Agroecological_zone':request.POST.get('region'),
         }
     )
+        messages.success(request, "✅ Profile created sucessfully!")
         return redirect("farmer")
+    
     return render(request, "farmer_profile.html")
 @require_POST
 def add_crop(request):
     profile = get_object_or_404(FarmerProfile, farmer=request.user)
-
     CropPlan.objects.create(
         farmer=request.user,
         profile=profile,
@@ -691,20 +731,60 @@ def add_crop(request):
     return redirect("farmer")
 
 @require_POST
+def select_crop(request, crop_id):
+    crop = get_object_or_404(CropPlan, id=crop_id, farmer=request.user)
+    crop_field=request.POST.get('crop_field')
+    harvesting_date_str = request.POST.get("harvesting_date")
+    harvesting_date = None
+    if harvesting_date_str:
+        harvesting_date = datetime.datetime.strptime(harvesting_date_str, "%Y-%m-%d").date()
+    chosen_crop = request.POST.get("chosen_crop")
+    crop_variety=request.POST.get('chosen_cropvariety')
+    print(crop_variety)
+    if chosen_crop:
+        crop.crop_name = chosen_crop
+        crop.crop_variety=crop_variety
+        crop.crop_field=crop_field
+        crop.current_stage = 2   # move to next stage
+        crop.harvesting_date=harvesting_date
+        crop.save()
+        return JsonResponse({"ok": True, "crop_name": chosen_crop, "crop_veriety": crop_variety , "stage":crop.current_stage})
+    else:
+        return JsonResponse({"ok": False, "error": "No crop selected"}, status=400)
+
+@require_POST
 def ask_rag(request, crop_id):
     try:
         crop = get_object_or_404(CropPlan, id=crop_id, farmer=request.user)
         farmerprofile=get_object_or_404(FarmerProfile,farmer=request.user)
+        # weather Data
+        weather_data = None
+        if farmerprofile.lat and farmerprofile.lon:
+            weather_data = get_weather(farmerprofile.lat, farmerprofile.lon)
         farmer_data = {
             "stage": int(crop.current_stage),
             "crop_name": crop.crop_name,   # will be None/blank at stage 1
             'last_ai_advice':crop.last_ai_advice,
             "land_size": farmerprofile.land_size,
+            "location":farmerprofile.location,
+            'Agroecological_zone':farmerprofile.Agroecological_zone,
             "soil_type": farmerprofile.soil_type,
             "water_source": farmerprofile.water_source,
-            "temperature": farmerprofile.temperature,
-            "soil_moisture": farmerprofile.soil_moisture,
+            # temp will be taken from iot devices
+            "soil_moisture": '50%', # soil mosture will be taken from iot devices 
+            'Soil_pH' :2  # Soil pH will come from iot devices
         }
+        
+        # Merge weather data if available
+        if weather_data:
+            farmer_data.update({
+                "temperature": weather_data["temperature"],
+                "humidity": weather_data["humidity"],
+                "pressure": weather_data['pressure'],
+                "wind_speed": weather_data['wind_speed'],
+                "last_rain": weather_data["last_rain"],
+                "next_rain": weather_data["next_rain"],
+            })
 
         print("➡️ Sending payload to Colab:", farmer_data)
         result = query_rag(**farmer_data)
@@ -730,17 +810,6 @@ def ask_rag(request, crop_id):
         return JsonResponse({"ok": False, "error": "Server crash, check logs"}, status=500)
 
 
-@require_POST
-def select_crop(request, crop_id):
-    crop = get_object_or_404(CropPlan, id=crop_id, farmer=request.user)
-    chosen_crop = request.POST.get("chosen_crop")
-    if chosen_crop:
-        crop.crop_name = chosen_crop
-        crop.current_stage = 2   # move to next stage
-        crop.save()
-        return JsonResponse({"ok": True, "crop_name": chosen_crop, "stage": crop.current_stage})
-    else:
-        return JsonResponse({"ok": False, "error": "No crop selected"}, status=400)
 @require_POST
 def advance_stage(request, crop_id):
     crop = get_object_or_404(CropPlan, id=crop_id, farmer=request.user)

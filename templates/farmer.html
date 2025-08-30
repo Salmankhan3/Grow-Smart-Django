@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Former Dashboard</title>
+    <title>Farmer Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -434,11 +434,11 @@
             }
         }
        {% comment %} Current crops {% endcomment %}
-       .currentcrops {
-  margin: 30px auto;
-  max-width: 1000px;
-  padding: 10px;
-  font-family: Arial, sans-serif;
+ .currentcrops {
+    margin: 30px auto;
+    max-width: 1200px;
+    padding: 10px;
+    font-family: Arial, sans-serif;
 }
 
 .crop-row {
@@ -449,7 +449,7 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 12px 15px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
@@ -457,8 +457,27 @@
   font-weight: bold;
   color: #2e7d32;
   min-width: 150px;
+  
 }
-
+.crop-Field,.crop-variety,.crop-stage{
+    padding: 10px 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+.crop-Field:hover,.crop-variety:hover,.crop-stage:hover {
+    background-color: #e8f5e8;
+    border-color: #4CAF50;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
 .crop-stage {
   min-width: 120px;
 }
@@ -475,6 +494,7 @@
   align-items: center;
   gap: 8px;
 }
+
 
 .crop-actions form.inline-form {
   display: flex;
@@ -514,7 +534,83 @@ button:hover {
   background: #3d327aff;
   transform:translateY(-3px)
 }
+ #out {
+            background: linear-gradient(135deg, #828aad 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            color: #ffffff;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            overflow-x: auto;
+            overflow-y: auto;
+            max-height: 500px;
+            min-height: 100px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transition: all 0.3s ease;
+        }
 
+        #out:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+        }
+       /* weahter card */
+       .weather-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    background: #ffffff;
+    border-radius: 50%;
+    padding: 10px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    transition: 0.3s;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+  }
+
+  .weather-toggle:hover {
+    background: #e6f4ff;
+    transform: scale(1.1);
+  }
+
+  .weather-card {
+    max-width: 300px;
+    padding: 20px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #f0f9ff, #dff5ff);
+    margin: 20px auto;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+    display: none; /* hidden by default */
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    z-index: 999;
+  }
+
+  .weather-card h2 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #0077b6;
+    display: flex;
+    align-items: center;
+  }
+
+  .weather-card h2 span {
+    margin-right: 10px;
+  }
+
+  .weather-card p {
+    margin: 6px 0;
+    font-size: 15px;
+    color: #333;
+  }
+        
     </style>
 </head>
 <body>
@@ -531,6 +627,24 @@ button:hover {
         {% endfor %}
     </div>
 {% endif %}
+
+<div class="weather-toggle" onclick="toggleWeather()">
+  <img src="https://img.icons8.com/ios-filled/50/0077b6/partly-cloudy-day.png" alt="Weather" width="30">
+</div>
+
+<!-- Weather Card -->
+<div id="weatherCard" class="weather-card">
+  <h2><span>🌤</span>Current Weather</h2>
+  {% if weather %}
+      <p><strong>🌡 Temperature:</strong> {{ weather.temperature }} °C</p>
+      <p><strong>💧 Humidity:</strong> {{ weather.humidity }} %</p>
+      <p><strong>🌧 Last Rain:</strong> {{ weather.last_rain|default:"No recent rain" }}</p>
+      <p><strong>☔ Next Expected Rain:</strong> {{ weather.next_rain|default:"No rain forecast soon" }}</p>
+  {% else %}
+      <p>⚠️ Weather info not available. Please set your location.</p>
+  {% endif %}
+</div>
+
 
   
     <div class="container">
@@ -662,10 +776,14 @@ button:hover {
    class="text-red-600" style='text-decoration:none;color:inherit;'>
     ✖️ 
     </a>
-      <div class="crop-name" style='margin-left:7px;'>{{ crop.crop_name|default:"(Not selected yet)" }}</div>
+      <div class="crop-name" style='margin-left:-10px;'>{{ crop.crop_name|default:"(Not selected yet)" }}</div>
+      <div class="crop-variety" style='margin-left:-50px;'>Variety : {{ crop.crop_variety|default:"(Not selected yet)" }}</div>
+      <div class="crop-Field">Crop_field: {{ crop.crop_field }}</div>
       <div class="crop-stage">Stage: {{ crop.stage_label }}</div>
       <div id="advice-{{ crop.id }}" class="mt-4 p-4 bg-gray-50 rounded-xl" class=crop_advice>
-  <p class="text-gray-700 line-clamp-3">{{ crop.last_ai_advice|truncatewords:30 }}</p>
+  <!-- <p class="text-gray-700 line-clamp-3">{{ crop.last_ai_advice|truncatewords:30 }}</p> -->
+   <div class="crop-sowed">Swod at : {{crop.created_at}}</div>
+   <div class="harvesting_date">Expected Harvesting date : {{crop.harvesting_date}}</div>
   {% if crop.last_ai_advice %}
     <a href="{% url 'crop_advice' crop.id %}" 
        class="text-green-600 font-medium hover:underline">
@@ -678,16 +796,20 @@ button:hover {
         {% if crop.current_stage == 1 %}
           <form method="post" action="{% url 'select_crop' crop.id %}" class="inline-form">
             {% csrf_token %}
-            <input type="text" name="chosen_crop" placeholder="Enter chosen crop">
+            <input type="text" name="chosen_crop" placeholder="Enter chosen crop" style="width:115px">
+            <input type="text" name="chosen_cropvariety" placeholder="Enter chosen crop Veriety" style="width:115px">
+            <input type="number" name="crop_field" placeholder="Enter crop_field in acre " style="width:115px">
+            <input type="date" name="harvesting_date" placeholder="Expected harvesting Date" style="width:113px">
             <button type="submit">Select Crop</button>
           </form>
-          <button onclick="askAI({{ crop.id }})" class="ai-btn">Get Crop Suggestions</button>
+          <button onclick="askAI({{crop.id}})" class="ai-btn">Get Crop Suggestions</button>
         {% else %}
           <form method="post" action="{% url 'advance_stage' crop.id %}" class="inline-form">
             {% csrf_token %}
             <button type="submit">Next Stage</button>
           </form>
           <button onclick="askAI({{ crop.id }})" class="ai-btn">Get Advice</button>
+          
         {% endif %}
       </div>
     </div>
@@ -701,6 +823,15 @@ button:hover {
     <pre id="out"></pre>
   </form>
 </div>
+{% if crop_advices %}
+  <h2>Todays Suggestion</h2>
+  {% for item in crop_advices %}
+    <div class="ai-advice-box">
+      <h3>{{ item.crop.crop_name }} (Stage {{ item.crop.current_stage }})</h3>
+      <p>{{ item.advice|linebreaks }}</p>
+    </div>
+  {% endfor %}
+{% endif %}
 
 
 
@@ -710,7 +841,7 @@ button:hover {
 
 
 <!-- send data to rag -->
-<pre id="out"></pre>
+
 
 
  <!-- end of send data to rag -->
@@ -744,7 +875,7 @@ document.getElementById('askForm').addEventListener('submit', async (e) => {
         'Content-Type': 'application/json',
         'X-CSRFToken': csrftoken
       },
-      body: JSON.stringify({ question: question })   // <--- IMPORTANT
+      body: JSON.stringify({ question: question })   
     });
 
     if (!res.ok) {
@@ -778,6 +909,12 @@ document.getElementById('askForm').addEventListener('submit', async (e) => {
   document.getElementById("out").textContent = data.ok ? data.answer : ("Error: " + data.error);
 }
     {% comment %} end crop list {% endcomment %}
+    // weather card
+      function toggleWeather() {
+    const card = document.getElementById("weatherCard");
+    card.style.display = (card.style.display === "block") ? "none" : "block";
+  }
+
     setTimeout(function() {
         let alertBox = document.getElementById('alert-box');
         if (alertBox) {
@@ -785,7 +922,7 @@ document.getElementById('askForm').addEventListener('submit', async (e) => {
             alertBox.style.opacity = 0;
             setTimeout(() => alertBox.remove(), 500);
         }
-    }, 2000);
+    },2000);
 </script>
 </body>
 </html>

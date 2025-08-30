@@ -11,7 +11,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Grow_Smart.settings")
 django.setup()
 from home.models import Notification, UserProfile
 conf = {
-    'bootstrap.servers': 'localhost:9092',
+    'bootstrap.servers': 'localhost:29092',
     #  always create a fresh consumer group so offsets never get stuck
     'group.id': f'exporter-group-{uuid.uuid4()}',
     'auto.offset.reset': 'earliest'
