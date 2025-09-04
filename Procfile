@@ -1,0 +1,1 @@
+web: gunicorn Grow_Smart_django-desktop.wsgi
