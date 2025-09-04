@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #a2c0dd, #f3f5f7);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 850px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #2d3436;
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+
+        .navigation-section {
+            display: flex;
+            gap: 50px;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+
+        .nav-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 30px 25px;
+            width: 250px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(116, 185, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-card:hover::before {
+            left: 100%;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #74b9ff;
+        }
+
+        .nav-card h3 {
+            color: #2d3436;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .nav-card p {
+            color: #636e72;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #0984e3, #74b9ff);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(116, 185, 255, 0.4);
+        }
+
+        .nav-btn:active {
+            transform: translateY(0);
+        }
+
+        .current-crops {
+            border-left: 4px solid #00b894;
+        }
+
+        .current-crops h3 {
+            color: #00b894;
+        }
+
+        .previous-crops {
+            border-left: 4px solid #e17055;
+        }
+
+        .previous-crops h3 {
+            color: #e17055;
+        }
+
+        .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .current-crops .icon {
+            color: #00b894;
+        }
+
+        .previous-crops .icon {
+            color: #e17055;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .navigation-section {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-card {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Crop Management</h1>
+        
+        <div class="navigation-section">
+            <div class="nav-card current-crops" onclick="openCurrentCrops()">
+                <span class="icon">🌱</span>
+                <h3>Current Crops</h3>
+                <p>View crops that are currently growing </p>
+                <button class="nav-btn" id="currentBtn">View Current Crops</button>
+            </div>
+            <div class="nav-card previous-crops" onclick="openPreviousCrops()">
+                <span class="icon">🌾</span>
+                <h3>Previous Crops</h3>
+                <p>Browse  and analyze harvested crop </p>
+                <button class="nav-btn" id="previousBtn" >View Previous Crops</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openCurrentCrops() {
+            const btn = document.getElementById('currentBtn');
+            
+            // Add loading state
+            btn.classList.add('loading');
+            btn.textContent = 'Loading...';
+            
+            // Simulate loading and redirect
+            setTimeout(() => {
+                
+                window.location.href = 'current_crops.html';
+            }, 100);
+        }
+
+        function openPreviousCrops() {
+            const btn = document.getElementById('previousBtn');
+            
+            // Add loading state
+            btn.classList.add('loading');
+            btn.textContent = 'Loading...';
+            
+            // Simulate loading and redirect
+            setTimeout(() => {
+                window.location.href='all_previous_crop.html';
+                
+            }, 100);
+        }
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '1') {
+                openCurrentCrops();
+            } else if (e.key === '2') {
+                openPreviousCrops();
+            }
+        });
+
+        // Add click ripple effect
+        document.querySelectorAll('.nav-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                const ripple = document.createElement('div');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(116, 185, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // CSS for ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current crop</title>
+   <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .currentcrops {
+            margin: 30px auto;
+            max-width: 1200px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .currentcrops h2 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .currentcrops h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #2e7d32, #4caf50);
+            border-radius: 2px;
+        }
+
+        #cropList {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .crop-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            background: #ffffff;
+            border: 1px solid #e0e6ed;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .crop-row::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2e7d32, #4caf50, #81c784);
+        }
+
+        .crop-row:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: #4caf50;
+        }
+
+        .crop-name {
+            font-weight: 700;
+            color: #2e7d32;
+            font-size: 1.1rem;
+            padding: 12px 15px;
+            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #4caf50;
+        }
+
+        .crop-variety, .crop-stage, .farmer, .crop-Field, .crop-sowed, .harvesting_date {
+            padding: 12px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            color: #495057;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .crop-variety:hover, .crop-stage:hover, .farmer:hover, .crop-Field:hover, .crop-sowed:hover, .harvesting_date:hover {
+            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+            border-color: #4CAF50;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+            cursor: pointer;
+            color: #2e7d32;
+        }
+
+        .crop-variety::before, .farmer::before, .crop-Field::before, .crop-stage::before, .crop-sowed::before, .harvesting_date::before {
+            content: attr(data-label);
+            display: block;
+            font-weight: 600;
+            color: #6c757d;
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .crop-stage {
+            background: linear-gradient(135deg, #fff3cd, #fef7e0);
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .crop-stage:hover {
+            background: linear-gradient(135deg, #fff3cd, #fef7e0);
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        /* Status indicators */
+        .stage-seedling { border-left: 4px solid #4caf50; }
+        .stage-vegetative { border-left: 4px solid #2196f3; }
+        .stage-flowering { border-left: 4px solid #ff9800; }
+        .stage-harvest { border-left: 4px solid #f44336; }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .crop-row {
+                flex-wrap: wrap;
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .currentcrops {
+                padding: 15px;
+                margin: 15px;
+            }
+            
+            .currentcrops h2 {
+                font-size: 1.8rem;
+            }
+            
+            .crop-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            .crop-variety, .crop-stage, .farmer, .crop-Field, .crop-sowed, .harvesting_date, .crop-name {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+
+        /* Animation for loading */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .crop-row {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .crop-row:nth-child(1) { animation-delay: 0.1s; }
+        .crop-row:nth-child(2) { animation-delay: 0.2s; }
+        .crop-row:nth-child(3) { animation-delay: 0.3s; }
+        .crop-row:nth-child(4) { animation-delay: 0.4s; }
+        .crop-row:nth-child(5) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+     <div class="currentcrops">
+  <h2>Current Crops</h2>
+  <div id="cropList">
+    {% for crop in current_crops %}
+    <div class="crop-row">
+      <div class="crop-name">{{ crop.crop_name}}</div>
+      <div class="crop-variety">Variety : {{ crop.crop_variety|default:"(Not selected yet)" }}</div>
+      <div class="farmer">Farmer : {{crop.farmer}}</div>
+      <div class="crop-Field">Acre : {{ crop.crop_field }}</div>
+      <div class="crop-stage">Stage: {{ crop.stage_label }}</div>
+      <div class="crop-sowed">Swod at : {{crop.created_at}}</div>
+      <div class="harvesting_date">Expected Harvesting date : {{crop.harvesting_date}}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</body>
+</html>

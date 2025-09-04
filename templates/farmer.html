@@ -610,6 +610,12 @@ button:hover {
     font-size: 15px;
     color: #333;
   }
+  .prevouse_crop{
+    margin-left: 80px;
+  }
+  .prevouse_crop h3{
+    font-weight: 800;
+  }
         
     </style>
 </head>
@@ -688,7 +694,7 @@ button:hover {
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
-                        Add/Remove Product
+                        Add Product
                     </button>
                 </div>
                 <div class="section-content">
@@ -702,10 +708,17 @@ button:hover {
                                 <div class="product-description">{{product.desc}}</div>
                             </div>
                             <div class="product-price">Rs. {{product.price}}</div>
-                            
                         </div>
                         {% endfor %}
-                        </div>
+                        
+                    </div>
+                    <div class="text-center mt-4" style="margin-left: 350px;margin-top: 10px; padding: 10px;">
+    <button 
+        onclick="window.location.href='{% url 'user_products' %}'"
+        class="px-6 py-2 bg-blue-600 text-white font-medium rounded-xl shadow-md hover:bg-blue-700 hover:shadow-lg transition">
+         View All Products
+    </button>
+</div>
                     </div>
                 </div>
 
@@ -776,9 +789,9 @@ button:hover {
    class="text-red-600" style='text-decoration:none;color:inherit;'>
     ✖️ 
     </a>
-      <div class="crop-name" style='margin-left:-10px;'>{{ crop.crop_name|default:"(Not selected yet)" }}</div>
+      <div class="crop-name" style='margin-left:-10px;'>{{ crop.crop_name}}</div>
       <div class="crop-variety" style='margin-left:-50px;'>Variety : {{ crop.crop_variety|default:"(Not selected yet)" }}</div>
-      <div class="crop-Field">Crop_field: {{ crop.crop_field }}</div>
+      <div class="crop-Field">Acre : {{ crop.crop_field }}</div>
       <div class="crop-stage">Stage: {{ crop.stage_label }}</div>
       <div id="advice-{{ crop.id }}" class="mt-4 p-4 bg-gray-50 rounded-xl" class=crop_advice>
   <!-- <p class="text-gray-700 line-clamp-3">{{ crop.last_ai_advice|truncatewords:30 }}</p> -->
@@ -789,21 +802,22 @@ button:hover {
        class="text-green-600 font-medium hover:underline">
        📖 Read Full Advice
     </a><br>
+    {% endif %}
     {% if crop.current_stage == 7 %}
+   
   {% if crop.outcome %}
     <p>
-      Outcome: {{ crop.outcome.get_status_display }}
+      Crop Yield: {{ crop.outcome.get_status_display }}
       {% if crop.outcome.yield_amount %}
-        ({{ crop.outcome.yield_amount }} kg)
+        {{ crop.outcome.yield_amount }} Ton
       {% endif %}
     </p>
   {% else %}
     <a href="{% url 'record_outcome' crop.id %}" class="btn btn-success">
-      📊 Record Harvest Outcome
+      📊 Record Harvested Yeild
     </a>
   {% endif %}
 {% endif %}
-  {% endif %}
 </div>
 
       <div class="crop-actions">
@@ -846,14 +860,9 @@ button:hover {
     </div>
   {% endfor %}
 {% endif %}
-<div class="stats-card" style="padding:15px; border-radius:10px; background:#e6ffe6; margin-bottom:20px;">
-  <h3>📊 Crop Outcome Summary</h3>
-  <p><strong>Total Completed Crops:</strong> {{ crop_stats.total }}</p>
-  <p><strong>✅ Successful:</strong> {{ crop_stats.success }}</p>
-  <p><strong>❌ Damaged:</strong> {{ crop_stats.damaged }}</p>
-  {% if stats.total > 0 %}
-    <p><strong>🌱 Success Rate:</strong> {{ crop_stats.success|floatformat:2 }}/{{ crop_stats.total }} ({{ crop_stats.success|divisibleby:stats.total|yesno:"100%,calc%" }})</p>
-  {% endif %}
+<div class="prevouse_crop" style="margin-left: 80px;">
+  <h3>Previous Crop</h3>
+<button class="view_previous_crop" style='margin-bottom: 20px; height: 40px;' onclick="window.location.href={% url 'previous_crops' %}">View Previouse Crop</button>
 </div>
 
 

@@ -143,7 +143,7 @@ import os
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "host.docker.internal:9092")
 KAFKA_TOPIC_PRODUCTS = os.getenv("KAFKA_TOPIC_PRODUCTS", "products")
 
-RAG_API_URL="https://6bbefb178e78.ngrok-free.app/rag"
+RAG_API_URL="https://583e55854ae8.ngrok-free.app/rag"
 RAG_API_KEY="salman"
 
 OPENWEATHER_API_KEY="e57ef8e6c86580479ce44db744ddb45f"

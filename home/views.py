@@ -92,7 +92,7 @@ def loginuser(request):
                 elif profile.userType == 'exporter':
                     return redirect('index')  
                 else:
-                    pass
+                    return redirect('analyst')
             except UserProfile.DoesNotExist:
                 print("User profile not found.")
                 pass
@@ -107,9 +107,8 @@ def regester_user(request):
         email=request.POST.get('mail')
         password=request.POST.get('password')
         usertype=request.POST.get('usertype')
-        if usertype not in ['farmer', 'exporter']:
+        if usertype not in ['farmer', 'exporter','analyst']:
             return render(request, 'regester.html', {'error': 'Please select a valid user type.'})
-        print(usertype)
         # Check if username or email already exists
         username = email.split('@')[0]
         # Check if username or email already exists
@@ -368,12 +367,7 @@ def addproduct(request):
             messages.error(request, f"Failed to add product: {str(e)}")
 
         return redirect('addproduct')
-    user=request.user
-    products=Product.objects.filter(owner=user)
-    context={
-        'products': products
-    }
-    return render(request, 'addproduct.html',context)
+    return render(request, 'addproduct.html')
 # delete Product
 def delete_product(request,pk):
     if request.method == "POST":
@@ -489,6 +483,16 @@ def search(request):
         }
     return render(request,'search.html',context)
 
+# Product of current user
+def user_products(request):
+    if request.user.is_anonymous:
+       return redirect('login')
+    user=request.user
+    products=Product.objects.filter(owner=user)
+    context={
+        'products': products
+    }
+    return render(request,'user_products.html',context)
 
 # Formers
 def former(request):
@@ -527,9 +531,10 @@ def former(request):
         order_totals[order.order_id]=total_price_for_user
         revenue+=total_price_for_user
         # print( order_statuses)
-    user_products=Product.objects.filter(owner=request.user)
+    ## products of current user
+    user_products=Product.objects.filter(owner=request.user).order_by('-data')[:5]
     # orders
-    order=Order.objects.filter(Q(product_owner__icontains=request.user.username))
+    order=Order.objects.filter(Q(product_owner__icontains=request.user.username)).order_by('-created_at')[:5]
     # crops
     crops = CropPlan.objects.filter(farmer=request.user)
     
@@ -890,5 +895,36 @@ def record_outcome(request, crop_id):
     return render(request, "record_outcome.html", {"form": form, "crop": crop})
 
 
+##### Previouse Crops #########
+def previous_crops(request):
+    previous_crops = CropPlan.objects.filter(
+        farmer=request.user,
+        current_stage=7,   # stage = Post-Harvesting
+        outcome__isnull=False
+    ).order_by("-harvesting_date")
 
+    return render(request, "previous_crops.html", {"previous_crops": previous_crops})
 
+def analyst(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    return render(request,'analyst.html')
+
+    
+def all_previous_crop(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    previous_crops=CropOutcome.objects.all()
+    
+    context={
+        'previous_crops' : previous_crops
+    }
+    return render(request,'all_previous_crops.html',context)
+def current_crops(request):
+    if request.user.is_anonymous:
+        return redirect('login')
+    current_crops=CropPlan.objects.all()
+    context={
+        'current_crops' : current_crops
+    }
+    return render(request,'current_crops.html',context)

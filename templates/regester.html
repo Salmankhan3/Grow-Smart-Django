@@ -14,10 +14,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Regester Page</title>
+    <title>Register Page</title>
     <link rel="stylesheet" href="{% static 'regester.css'%}">
     <script src="https://kit.fontawesome.com/a18ae6822d.js" crossorigin="anonymous"></script>
+    <style> .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            margin-top: 15px;
+        }
 
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 300;
+            font-size: 24px;
+        }
+
+        .usertype {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            border: none;
+            border-radius: 15px;
+            box-shadow: 
+                inset 5px 5px 10px #d1d1d1,
+                inset -5px -5px 10px #ffffff;
+            transition: all 0.3s ease;
+            flex-wrap: wrap;
+        }
+
+        .usertype:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                inset 3px 3px 8px #d1d1d1,
+                inset -3px -3px 8px #ffffff,
+                0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .usertype label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 12px 20px;
+            border-radius: 25px;
+            background: white;
+            box-shadow: 
+                3px 3px 6px #d1d1d1,
+                -3px -3px 6px #ffffff;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #555;
+            min-width: 120px;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .usertype label::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .usertype label:hover::before {
+            left: 100%;
+        }
+
+        .usertype label:hover {
+            transform: translateY(-1px);
+            box-shadow: 
+                4px 4px 8px #d1d1d1,
+                -4px -4px 8px #ffffff;
+            color: #007bff;
+        }
+
+        .usertype input[type="radio"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 
+                inset 2px 2px 4px #d1d1d1,
+                inset -2px -2px 4px #ffffff;
+        }
+
+        .usertype input[type="radio"]:checked {
+            border-color: #007bff;
+            background: linear-gradient(145deg, #007bff, #0056b3);
+            box-shadow: 
+                inset 2px 2px 4px #0056b3,
+                inset -2px -2px 4px #4da3ff;
+        }
+
+        .usertype input[type="radio"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: checkPulse 0.3s ease-out;
+        }
+
+        .usertype label:has(input:checked) {
+            background: linear-gradient(145deg, #e7f3ff, #cce7ff);
+            color: #007bff;
+            box-shadow: 
+                inset 2px 2px 4px #b3d9ff,
+                inset -2px -2px 4px #ffffff;
+            transform: translateY(-1px);
+        }
+
+        @keyframes checkPulse {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .icon {
+            font-size: 18px;
+            margin-right: 4px;
+        }
+
+        .farmer-icon::before { content: '🌾'; }
+        .exporter-icon::before { content: '📦'; }
+        .analyst-icon::before { content: '📊'; }
+
+        @media (max-width: 600px) {
+            .usertype {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+            }
+            
+            .usertype label {
+                min-width: 200px;
+            }
+
+            .container {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Additional animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .usertype {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .usertype label {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .usertype label:nth-child(1) { animation-delay: 0.1s; }
+        .usertype label:nth-child(2) { animation-delay: 0.2s; }
+        .usertype label:nth-child(3) { animation-delay: 0.3s; }</style>
     <script>
     //scroll 
     window.onload = function () {
@@ -82,24 +266,36 @@
         <input type="password" name="password"  placeholder="Enter your password">
         </div><br>
         <div class="confirm_password_div"> 
-        <b>confirm Password :</b>
+        <b>Confirm Password:</b>
         <input type="password" name="confirm_password"  placeholder="Enter your password">
         </div><br>
         <div class="email_div">
             <b>Your Email : </b>
             <input type="text" name="mail"  placeholder="Enter your Email" style='margin-left:2px;'><br>
         </div>
-      <div class="usertype" style="margin-top:30px;display: flex; gap: 15px; align-items: center;justify-content:center; padding: 10px; background-color: #f8f9fa; border: 1px solid #ccc; border-radius: 8px;">
-    <label for="farmer" style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-        <input type="radio" value="farmer" name="usertype" id="farmer" style="accent-color: #007bff; transform: scale(1.2); cursor: pointer;">
-        Former
-    </label>
-    
-    <label for="Buyer" style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
-        <input type="radio" value="exporter" name="usertype" id="exporter" style="accent-color: #007bff; transform: scale(1.2); cursor: pointer;">
-        Exporter
-    </label>
-</div>
+      <div class="container">
+        <h2>Select Your User Type</h2>
+        
+        <div class="usertype">
+            <label for="farmer">
+                <input type="radio" value="farmer" name="usertype" id="farmer">
+                <span class="icon farmer-icon"></span>
+                Farmer
+            </label>
+            
+            <label for="exporter">
+                <input type="radio" value="exporter" name="usertype" id="exporter">
+                <span class="icon exporter-icon"></span>
+                Exporter
+            </label>
+            
+            <label for="analyst">
+                <input type="radio" value="analyst" name="usertype" id="analyst">
+                <span class="icon analyst-icon"></span>
+                Analyst
+            </label>
+        </div>
+    </div>
 
         <div class="submit-btn"><input type="submit" id="submit-btn" value="Register"></div>
           <div class="reset-btn">  <input type="reset" name="reset-btn" value="Clear"> </div>

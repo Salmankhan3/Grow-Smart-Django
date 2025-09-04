@@ -1,6 +1,5 @@
 {% block content %}
 <style>
-    /* Container styling */
 .container {
     max-width: 600px;
     background: #ffffff;
@@ -10,8 +9,6 @@
     margin: 20px auto;
     border: 1px solid #e8f5e8;
 }
-
-/* Header styling */
 h2 {
     color: #2c5530;
     font-size: 1.8rem;
@@ -28,7 +25,7 @@ h2::before {
     margin-right: 10px;
 }
 
-/* Form styling */
+
 form {
     background: #f8fdf8;
     padding: 25px;
@@ -50,12 +47,12 @@ form label {
     text-transform: capitalize;
 }
 
-/* Input field styling */
+
 form input[type="text"],
 form input[type="number"],
 
-form textarea,
-form select {
+form textarea 
+{
     width: 100%;
     padding: 12px 15px;
     border: 2px solid #c8e6c9;
@@ -67,8 +64,8 @@ form select {
 }
 
 form input:focus,
-form textarea:focus,
-form select:focus {
+form textarea:focus
+{
     outline: none;
     border-color: #4caf50;
     box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
@@ -131,7 +128,7 @@ form textarea {
     margin-top: 1.5rem;
 }
 
-/* Error styling (for Django form errors) */
+
 .errorlist {
     list-style: none;
     padding: 0;
@@ -148,14 +145,17 @@ form textarea {
     margin-bottom: 5px;
 }
 
-/* Help text styling */
 .helptext {
     font-size: 12px;
     color: #111010;
     margin-top: 7px;
 }
 
-/* Required field indicator */
+
+
+
+
+
 label:after {
     content: " *";
     color: #e74c3c;
@@ -183,20 +183,32 @@ label:after {
     }
 }
 
-
 .btn-success:active {
     transform: translateY(0);
     box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
 }
-
 
 .btn:focus {
     outline: 2px solid #4caf50;
     outline-offset: 2px;
 }
 </style>
+
+<script>
+// JavaScript to update help text on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Find all help text elements and update yield-related ones
+    const helpTexts = document.querySelectorAll('.helptext');
+    helpTexts.forEach(function(helpText) {
+        if (helpText.textContent.includes('kilogram') || helpText.textContent.includes('(or tons)')) {
+            helpText.textContent = 'Yield in Tons';
+        }
+    });
+});
+</script>
+
 <div class="container mt-4">
-  <h2> Record Outcome for {{ crop.crop_name }}</h2>
+  <h2> Record Yield for {{ crop.crop_name }}</h2>
 
   <form method="post">
     {% csrf_token %}
