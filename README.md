@@ -5,6 +5,7 @@ catagory and can view their product on farmer dashboard.They can view their acti
 They can contact admin for any issue.Kafka is used as messaging service.When farmer list product, the notifiaction is send to all exporter with all product detail.
 Farmer can add thier land information like land size,land location (agro-ecological zone)soil type,water resource(rain,tubewell,canal) etc.
 Farmer cantake AI assistance for crop management like crop suggestion based on land inforamtion, what to do in specific stage.
+
 crop managment flow:
 1) farmer want to add product
 2) Ai suggest top three crops and thir varaity based on land inforamtion and current weather condiotion(stage 1).
