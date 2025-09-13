@@ -20,10 +20,10 @@
       </div>
          <form name='search' class='search' action="{% url 'search'%}" method='GET'>
          <div class="search-bar">
-            <select class="search-select">
+           <select class="search-select" name="category">
                 <option>All</option>
                 <option value="fruit">Fruits</option>
-                <option value="Vigitables">Vigitables</option>
+                <option value="Vegetable">Vegetables</option>
                 <option value="seeds">Seeds</option>
                 <option value="Dryfruit">Dryfruit</option>
             </select>
@@ -91,12 +91,13 @@
                 <input type="hidden" name="product_id" class='product_id' value="{{ cart_item.product.id }}">
                 <td>{{cart_item.product.name}}</td>
                 <td class="price">{{cart_item.product.price}}</td>
-                <td>
-    <input type="number" 
+                <td> <input type="number" 
            value="{{ cart_item.quantity }}" 
+           data-id="{{ cart_item.id }}"
            class="quantity" style="width: 60px; height:30px; padding: 5px; border: 2px solid #ccc; border-radius: 4px; text-align: center;"></td>
                <td class="subtotal" style="text-align: left; padding-left: 85px;"> {{ cart_item.subtotal }}</td>
-            </tr> 
+            </tr>
+            
 
             {% endfor %}
         </tbody>
@@ -298,8 +299,24 @@ document.getElementById("check-out-btn").addEventListener("click", () => {
   // Redirect to checkout
   window.location.href = "checkout.html";
 });
+ 
+// for quantity change
+document.querySelectorAll(".quantity").forEach(input => {
+  input.addEventListener("change", function () {
+    const cartItemId = this.dataset.id;
+    const newQty = this.value;
 
-
+    fetch(`/cart/update/${cartItemId}/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": "{{ csrf_token }}", 
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ quantity: newQty })
+    })
+    .then(res => res.json())
+  });
+});
 </script>
 </body>
 </html>

@@ -20,10 +20,10 @@
       </div>
          <form name='search' class='search' action="{% url 'search'%}" method='GET'>
          <div class="search-bar">
-            <select class="search-select">
+            <select class="search-select" name="category">
                 <option>All</option>
                 <option value="fruit">Fruits</option>
-                <option value="Vigitables">Vigitables</option>
+                <option value="Vegetable">Vegetables</option>
                 <option value="seeds">Seeds</option>
                 <option value="Dryfruit">Dryfruit</option>
             </select>
@@ -582,9 +582,8 @@
       const price = priceText.split(" ")[1]; // "600"
 
       const bgImageStyle = box.querySelector(".box-img").style.backgroundImage;
-      const imageUrl = bgImageStyle.slice(5, -2); // remove url('...') wrapper
+      const imageUrl = bgImageStyle.slice(5, -2); 
       const imageurl2="http://127.0.0.1:8000/"+imageUrl
-      console.log(imageurl2)
       // Create a product object
       const product = {
         name,
@@ -611,15 +610,7 @@
  
 });
 //localStorage.clear();
-// logic for chat bot
-  const chatIcon = document.getElementById('chatbot-icon');
-  const chatbotWindow = document.getElementById('chatbot-window');
 
-  chatIcon.addEventListener('click', () => {
-    chatbotWindow.style.display = chatbotWindow.style.display === 'none' || chatbotWindow.style.display === '' 
-      ? 'block' 
-      : 'none';
-        });
 </script>
 </body>
 </html>

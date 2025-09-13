@@ -162,8 +162,8 @@
 
       document.getElementById("itemsjson").value = JSON.stringify(cartItems);
       if (paymentMethod === "cod") {
-      return; // allow normal form submission
-    }
+      return;
+      }
     });
   });
   document.addEventListener("DOMContentLoaded", () => {
@@ -223,7 +223,6 @@
 //when user click on back buuton on browser
 window.addEventListener("beforeunload", function (e) {
  localStorage.removeItem("discountedTotal")
-  // You can show a confirmation dialog in some browsers
   e.preventDefault();
   
   e.returnValue = '';
@@ -259,7 +258,7 @@ window.addEventListener("beforeunload", function (e) {
     order_history_btn.innerText='View-Order-History'
     document.querySelector(".order_history").appendChild(order_history_btn)  
     continue_shoping_btn.setAttribute("class","continue_shoping_btn")
-    continue_shoping_btn.setAttribute("onclick",'window.location.href="index"')
+    continue_shoping_btn.setAttribute("onclick",'window.location.href="{% url "index" %}"');
     continue_shoping_btn.setAttribute('type','button')
     continue_shoping_btn.innerText='Continue Shoping'
     document.querySelector(".order_history").appendChild(continue_shoping_btn)   

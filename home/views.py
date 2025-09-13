@@ -84,7 +84,6 @@ def loginuser(request):
             login(request, user)
             try:
                 profile = UserProfile.objects.get(user=user)
-                print("User type: ",profile.userType)
                 if profile.userType == 'farmer':
                    if not FarmerProfile.objects.filter(farmer=request.user).exists():
                         return redirect('create_profile')
@@ -97,7 +96,6 @@ def loginuser(request):
                 print("User profile not found.")
                 pass
         else:
-            print('Invalid credentials')
             return render(request, 'login.html', {'error': 'Invalid username or password'})
     return render(request, 'login.html')
 
@@ -196,14 +194,35 @@ def cart(request, total=0, quantity=0, cart_items=None):
             cart_item.subtotal=cart_item.product.price * cart_item.quantity
     except ObjectDoesNotExist:
         cart_items = []
-
+    
     context = {
         'total': total,
         'quantity': quantity,
         'cart_items': cart_items
     }
     return render(request, 'cart.html', context)
+def update_cart(request, cart_item_id):
+  if request.method == "POST":
+        data = json.loads(request.body)
+        quantity = int(data.get("quantity", 1))
 
+        cart_item = get_object_or_404(CartItem, id=cart_item_id, user=request.user)
+        cart_item.quantity = quantity
+        cart_item.save()
+
+        # Recalculate totals
+        cart = Cart.objects.get(cart_id=_cart_id(request))
+        cart_items = CartItem.objects.filter(cart=cart, user=request.user, is_active=True)
+        total = sum(item.product.price * item.quantity for item in cart_items)
+        subtotal = cart_item.product.price * cart_item.quantity
+
+        return JsonResponse({
+            "success": True,
+            "subtotal": subtotal,
+            "total": total
+        })
+
+  return JsonResponse({"success": False}, status=400)
 def checkout(request):
     if request.user.is_anonymous:
         return redirect('login')
@@ -468,18 +487,34 @@ def tracker(request):
 def search(request):
     
     keyword = request.GET.get('keyword', '').strip()
-    products = []
-    product_count=0
+    category = request.GET.get('category', '').strip().lower()
+    CATEGORY_ALIASES = {
+        "fruit": ["fruit", "fruits", "friut", "fruitt", "fruites"],
+        "vegetable": ["vegetable", "vegetables", "vegitable", "veg", "vegies"],
+        "dryfruit": ["dryfruit", "dryfruits", "drufruit", "dry fruit", "dry-fruit"],
+        "seed": ["seed", "seeds"],
+    }
+    products = Product.objects.all()
     if 'keyword' in request.GET:
         keyword=request.GET['keyword']
         if keyword:
-            products=Product.objects.order_by('data').filter(Q(desc__icontains=keyword) | Q(name__icontains=keyword) | Q(category__icontains=keyword) |Q(subcategory=keyword))
-            print(products)
-            product_count=products.count()
+            products=products.order_by('data').filter(Q(desc__icontains=keyword) | Q(name__icontains=keyword) | Q(category__icontains=keyword) |Q(subcategory=keyword))
+    if category and category != "all":
+        matched_category = None
+        for key, aliases in CATEGORY_ALIASES.items():
+            if category in aliases:
+                matched_category = key
+                break
+    if matched_category:
+            products = products.filter(category__iexact=matched_category)
+    print('catagory:',products)
+    product_count=products.count()
     context={
         'products':products,
         'searched': bool(keyword),
         'product_count': product_count,
+        'selected_category': category,
+        'keyword': keyword
         }
     return render(request,'search.html',context)
 
@@ -496,6 +531,9 @@ def user_products(request):
 
 # Formers
 def former(request):
+    userprofile=UserProfile.objects.get(user=request.user)
+    if userprofile.userType !='farmer':
+         return HttpResponseForbidden("🚫 You don’t have permission to access this page.")
     activeproduct=Product.objects.filter(owner=request.user).count()
     full_name=(str(request.user.first_name)).upper()
     name="".join([part[0].upper() for part in full_name.split()])
@@ -621,10 +659,8 @@ def former(request):
                 messages.success(request, "✅ Your message was sent successfully!")
             except:
                 messages.error(request, "❌ Please enter a message before sending.")
-    userprofile=UserProfile.objects.get(user=request.user)
-    if userprofile.userType !='farmer':
-         return HttpResponseForbidden("🚫 You don’t have permission to access this page.")
     return render(request,'farmer.html',context)
+   
 
 # order for farmer
 def farmer_orders(request):
@@ -908,6 +944,9 @@ def previous_crops(request):
 def analyst(request):
     if request.user.is_anonymous:
         return redirect('login')
+    userprofile=UserProfile.objects.get(user=request.user)
+    if userprofile.userType !='analyst':
+         return HttpResponseForbidden("🚫 You don’t have permission to access this page.")
     return render(request,'analyst.html')
 
     

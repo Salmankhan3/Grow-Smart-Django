@@ -33,6 +33,7 @@ urlpatterns = [
     path('checkout/cancel/', views.checkout_cancel, name='checkout_cancel'),
     path('add_cartcart/checkout',views.checkout,name='checkout'),
     path('remove_cart',views.remove_cart,name='remove_cart'),
+    path("cart/update/<int:cart_item_id>/", views.update_cart, name="update_cart"),
     path('farmer',views.former,name='farmer'),
     path('farmer_orders',views.farmer_orders,name='farmer_orders'),
     path('update-order-status/<int:order_id>/', views.update_order_status, name='update_order_status'),
