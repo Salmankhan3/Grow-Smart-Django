@@ -115,12 +115,28 @@
         grid-template-columns: 1fr;
       }
     }
+     .alert {
+      max-width: 500px;
+      margin: 1rem auto;
+      padding: 10px;
+      border-radius: 5px;
+      color: white;
+    }
+
+    .alert-success {
+      background-color: #28a745;
+    }
   </style>
 </head>
 <body>
   <div class="head">
     <h2>All Products</h2>
   </div>
+  {%if messages%}
+   {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+  {% endif %}
   <div class="product-grid">
     {% for product in products %}
     <div class="product-card">

@@ -391,9 +391,9 @@ def addproduct(request):
 def delete_product(request,pk):
     if request.method == "POST":
         product = get_object_or_404(Product, pk=pk, owner=request.user)  # Only delete if this user owns it
-        print(product)
         product.delete()
-    return redirect('addproduct')
+        messages.success(request, f"Product '{product.name}' Removed sucessfully")
+    return redirect('user_products')
 
 def product_cart(request):
     if request.user.is_anonymous:

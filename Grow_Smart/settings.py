@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-5adj&g$7m5l#3no#1@8%ap$v)q&md(p1l3not2!#ub52ut**jz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['growsmart.com','127.0.0.1']
+ALLOWED_HOSTS = ['growsmart.com','www.growsmart.com','127.0.0.1','localhost']
 
 
 # Application definition
@@ -134,16 +134,18 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 
-
-STRIPE_SECRET_KEY='sk_test_51RqBipHNWpaSrYNup7nUSN0SPcJxT8RuqJNbnKATC9nXoHllUre02yGIQz7POJILSxIBDr7rKCfuWnAb4TzpQcGf00zpbuUJjm'
-STRIPE_Publishable_KEY='pk_test_51RqBipHNWpaSrYNusSa7WTEsFNFsNOiBlF8kIluAHpw4jR77IUAVVSbTiz6okVyosriI4BcjbGQo920KKiCe3hCb00t23XXEF9'
-
 import os
+from dotenv import load_dotenv,dotenv_values
+load_dotenv()
 
-KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "host.docker.internal:9092")
-KAFKA_TOPIC_PRODUCTS = os.getenv("KAFKA_TOPIC_PRODUCTS", "products")
+STRIPE_SECRET_KEY=os.getenv('STRIPE_SECRET_KEY')
+STRIPE_Publishable_KEY=os.getenv('STRIPE_Publishable_KEY')
 
-RAG_API_URL="https://583e55854ae8.ngrok-free.app/rag"
-RAG_API_KEY="salman"
 
-OPENWEATHER_API_KEY="e57ef8e6c86580479ce44db744ddb45f"
+KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS")
+KAFKA_TOPIC_PRODUCTS = os.getenv("KAFKA_TOPIC_PRODUCTS")
+
+RAG_API_URL=os.getenv('RAG_API_URL')
+RAG_API_KEY=os.getenv('RAG_API_KEY')
+
+OPENWEATHER_API_KEY=os.environ.get('weather_api_key')
